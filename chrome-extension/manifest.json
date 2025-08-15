@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "Movie Data Manager Helper",
+  "version": "0.1.0",
+  "description": "Automatically opens torrent modal, extracts links, and prints structured JSON to console.",
+  "icons": {
+    "16": "logo.png",
+    "32": "logo.png",
+    "48": "logo.png",
+    "128": "logo.png"
+  },
+  "action": {
+    "default_icon": {
+      "16": "logo.png",
+      "32": "logo.png",
+      "48": "logo.png",
+      "128": "logo.png"
+    },
+    "default_title": "Movie Data Manager"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://en.rarbg-official.com/movies/*"
+      ],
+      "js": [
+        "dist/content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}
