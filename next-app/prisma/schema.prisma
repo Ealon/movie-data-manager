@@ -15,9 +15,9 @@ datasource db {
 }
 
 model Movie {
-  id         String   @id @default(uuid())
-  title      String
-  url        String
+  id         String   @id @unique @default(uuid())
+  title      String   @unique
+  url        String   @unique
   coverImage String?
   coverTitle String?
   coverAlt   String?
@@ -27,12 +27,12 @@ model Movie {
 }
 
 model Link {
-  id       String @id @default(uuid())
+  id       String @id @unique @default(uuid())
   movie    Movie  @relation(fields: [movieId], references: [id])
   movieId  String
   quality  String
   size     String
   source   String
-  magnet   String
-  download String
+  magnet   String @unique
+  download String @unique
 }

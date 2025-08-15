@@ -1,5 +1,3 @@
-
-
 interface CoverImageInfo {
   src: string | null;
   title: string | null;
@@ -160,14 +158,28 @@ function main(): void {
 
       // 8. Print out the json data into the console
       try {
-        // eslint-disable-next-line no-console
         console.log(JSON.stringify(data, null, 2));
-      } catch {
-        // eslint-disable-next-line no-console
-        console.log(data);
+        const response = await fetch("http://localhost:8120/api/movie", {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const result = await response.json();
+        console.log(
+          "\n\n%c[Movie Data Manager] Response:\n",
+          "background: #f16; color: white; padding: 2px 6px; border-radius: 2px;",
+          JSON.stringify(result, null, 2),
+          "\n\n",
+        );
+      } catch (error) {
+        console.error("[Movie Data Manager] Error1:", error);
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("[Movie Data Manager] Unexpected error:", error);
     }
   }
