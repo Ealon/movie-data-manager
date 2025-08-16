@@ -57,7 +57,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Pa
             const searchDoubanHref = `https://search.douban.com/movie/subject_search?search_text=${searchWord}`;
             return (
               <div key={movie.id} className="rounded border border-slate-300 dark:border-white/10 overflow-hidden">
-                <div className="bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
+                <div className="bg-gray-100 relative dark:bg-gray-900">
                   {movie.coverImage ? (
                     <Link className="w-full" style={{ aspectRatio: "2/3" }} href={movie.url} target="_blank">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -73,10 +73,12 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Pa
                       <div className="size-[64px] rounded bg-gray-300 dark:bg-gray-700" />
                     </div>
                   )}
+                  <div className="absolute bottom-0 left-0 w-full h-fit py-3 bg-gradient-to-t from-black/95 to-transparent via-black/70 flex items-center justify-center">
+                    <h2 className="text-white text-lg font-bold">{movie.title}</h2>
+                  </div>
                 </div>
                 <div className="p-4 flex flex-col gap-3">
                   <div>
-                    <h2 className="text-lg mb-2 font-bold line-clamp-2">{movie.title}</h2>
                     <a
                       href={searchDoubanHref}
                       target="_blank"
