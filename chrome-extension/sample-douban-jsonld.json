@@ -1,0 +1,153 @@
+{
+  "@context": "http://schema.org",
+  "name": "还有明天 C&#39;è ancora domani",
+  "url": "/subject/36445098/",
+  "image": "https://img9.doubanio.com/view/photo/s_ratio_poster/public/p2918279456.webp",
+  "director": [
+    {
+      "@type": "Person",
+      "url": "/celebrity/1037602/",
+      "name": "宝拉·柯特莱西 Paola Cortellesi"
+    }
+  ],
+  "author": [
+    {
+      "@type": "Person",
+      "url": "/celebrity/1037602/",
+      "name": "宝拉·柯特莱西 Paola Cortellesi"
+    },
+    {
+      "@type": "Person",
+      "url": "/celebrity/1302925/",
+      "name": "吉利亚·卡伦达 Giulia Calenda"
+    },
+    {
+      "@type": "Person",
+      "url": "/celebrity/1378145/",
+      "name": "法里奥·安德烈奥蒂 Furio Andreotti"
+    }
+  ],
+  "actor": [
+    {
+      "@type": "Person",
+      "url": "/celebrity/1037602/",
+      "name": "宝拉·柯特莱西 Paola Cortellesi"
+    },
+    {
+      "@type": "Person",
+      "url": "/celebrity/1005301/",
+      "name": "瓦莱里奥·马斯坦德雷亚 Valerio Mastandrea"
+    },
+    {
+      "@type": "Person",
+      "url": "/celebrity/1528455/",
+      "name": "罗马纳·马乔拉·韦尔加诺 Romana Maggiora Vergano"
+    },
+    {
+      "@type": "Person",
+      "url": "/celebrity/1524666/",
+      "name": "埃马努艾拉·法内利 Emanuela Fanelli"
+    },
+    {
+      "@type": "Person",
+      "url": "/celebrity/1281005/",
+      "name": "乔治·科兰杰利 Giorgio Colangeli"
+    },
+    {
+      "@type": "Person",
+      "url": "/celebrity/1314045/",
+      "name": "维尼乔·马尔基奥尼 Vinicio Marchioni"
+    },
+    {
+      "@type": "Person",
+      "url": "/celebrity/1528460/",
+      "name": "弗朗切斯科·琴托拉梅 Francesco Centorame"
+    },
+    {
+      "@type": "Person",
+      "url": "/celebrity/1528456/",
+      "name": "雷法莱·维诺利 Raffaele Vannoli"
+    },
+    {
+      "@type": "Person",
+      "url": "/celebrity/1509942/",
+      "name": "保拉·蒂齐亚娜·克鲁恰尼 Paola Tiziana Cruciani"
+    },
+    {
+      "@type": "Person",
+      "url": "/celebrity/1523262/",
+      "name": "尤夫·约瑟夫 Yonv Joseph"
+    },
+    {
+      "@type": "Person",
+      "url": "/celebrity/1018639/",
+      "name": "阿蕾西娅·贝儿拉 Alessia Barela"
+    },
+    {
+      "@type": "Person",
+      "url": "/celebrity/1528458/",
+      "name": "费德里科·托奇 Federico Tocci"
+    },
+    {
+      "@type": "Person",
+      "url": "/celebrity/1528459/",
+      "name": "普里西拉·米科尔·马里诺 Priscilla Micol Marino"
+    },
+    {
+      "@type": "Person",
+      "url": "/celebrity/1528457/",
+      "name": "玛丽亚·基娅拉·奥尔蒂 Maria Chiara Orti"
+    },
+    {
+      "@type": "Person",
+      "url": "/celebrity/1508644/",
+      "name": "西尔维亚·萨尔瓦托雷 Silvia Salvatori"
+    },
+    {
+      "@type": "Person",
+      "url": "/celebrity/1528461/",
+      "name": "马提亚·巴尔多 Mattia Baldo"
+    },
+    {
+      "@type": "Person",
+      "url": "/celebrity/1528462/",
+      "name": "詹马尔科·菲利皮尼 Gianmarco Filippini"
+    },
+    {
+      "@type": "Person",
+      "url": "/celebrity/1529487/",
+      "name": "芭芭拉·基耶萨 Barbara Chiesa"
+    },
+    {
+      "@type": "Person",
+      "url": "/celebrity/1580251/",
+      "name": "加布里埃拉·保罗卡 Gabriele Paoloca"
+    },
+    {
+      "@type": "Person",
+      "url": "/celebrity/1089667/",
+      "name": "阿尔曼多·德·拉扎 Armando De Razza"
+    },
+    {
+      "@type": "Person",
+      "url": "/celebrity/1528463/",
+      "name": "基娅拉·波诺 Chiara Bono"
+    }
+  ],
+  "datePublished": "2023-10-26",
+  "genre": [
+    "\u5267\u60c5",
+    "\u559c\u5267",
+    "\u5386\u53f2"
+  ],
+  "duration": "PT1H58M",
+  "description": "1946年二战后的意大利，女性地位依旧低下。底层女性迪莉娅（宝拉·柯特莱西 Paola Cortellesi 饰），每日在丈夫的暴虐下和生活琐碎中艰难生存，唯有女儿玛塞拉、朋友玛丽莎和每日难得的自由踱...",
+  "@type": "Movie",
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingCount": "313181",
+    "bestRating": "10",
+    "worstRating": "2",
+    "ratingValue": "9.4"
+  }
+}

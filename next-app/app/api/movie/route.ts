@@ -1,12 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Link, PrismaClient } from "../../../generated/prisma";
+import { sanitizeName } from "@/lib/utils";
 
 const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    console.log(body);
+    // Basic shape validation
+    if (!body || typeof body !== "object") {
+      return withCors(NextResponse.json({ message: "Invalid body" }, { status: 400 }));
+    }
+    if (typeof body.title !== "string" || typeof body.url !== "string") {
+      return withCors(NextResponse.json({ message: "Missing title or url" }, { status: 400 }));
+    }
+    const links = Array.isArray(body.links) ? body.links : [];
+    const normalizedLinks = links
+      .map((l: any) => ({
+        quality: String(l?.quality || "").trim(),
+        size: String(l?.size || "").trim(),
+        source: String(l?.source || "")
+          .trim()
+          .toUpperCase(),
+        magnet: typeof l?.magnet === "string" ? l.magnet : null,
+        download: typeof l?.download === "string" ? l.download : null,
+      }))
+      .filter((l) => l.quality && l.size && l.source && l.magnet && l.download);
     // Check for existing movie by unique fields (e.g., title and url)
     const existingMovie = await prisma.movie.findUnique({
       where: {
@@ -20,7 +39,7 @@ export async function POST(request: NextRequest) {
     if (existingMovie) {
       // Check for duplicated links
       const existingLinks = existingMovie.links || [];
-      const newLinks = body.links.filter((newLink: Link) => {
+      const newLinks = normalizedLinks.filter((newLink: Link) => {
         return !existingLinks.some(
           (existingLink: Link) =>
             existingLink.quality === newLink.quality &&
@@ -32,6 +51,22 @@ export async function POST(request: NextRequest) {
       });
 
       if (newLinks.length === 0) {
+        if (
+          existingMovie.coverImage !== body.coverImage?.src ||
+          existingMovie.coverTitle !== sanitizeName(body.coverImage?.title) ||
+          existingMovie.coverAlt !== sanitizeName(body.coverImage?.alt) ||
+          existingMovie.title !== sanitizeName(body.title)
+        ) {
+          await prisma.movie.update({
+            where: { id: existingMovie.id },
+            data: {
+              coverImage: body.coverImage?.src,
+              coverTitle: sanitizeName(body.coverImage?.title),
+              coverAlt: sanitizeName(body.coverImage?.alt),
+              title: sanitizeName(body.title),
+            },
+          });
+        }
         return NextResponse.json(
           { message: "Movie and all links already exist", movie: existingMovie },
           { status: 200 },
@@ -42,6 +77,10 @@ export async function POST(request: NextRequest) {
       const updatedMovie = await prisma.movie.update({
         where: { id: existingMovie.id },
         data: {
+          coverImage: body.coverImage?.src,
+          coverTitle: sanitizeName(body.coverImage?.title),
+          coverAlt: sanitizeName(body.coverImage?.alt),
+          title: sanitizeName(body.title),
           links: {
             create: newLinks.map((link: Link) => ({
               quality: link.quality,
@@ -60,13 +99,13 @@ export async function POST(request: NextRequest) {
 
     const movie = await prisma.movie.create({
       data: {
-        title: body.title,
+        title: sanitizeName(body.title),
         url: body.url,
         coverImage: body.coverImage?.src,
-        coverTitle: body.coverImage?.title,
-        coverAlt: body.coverImage?.alt,
+        coverTitle: sanitizeName(body.coverImage?.title),
+        coverAlt: sanitizeName(body.coverImage?.alt),
         links: {
-          create: body.links.map((link: Link) => ({
+          create: normalizedLinks.map((link: Link) => ({
             quality: link.quality,
             size: link.size,
             source: link.source,
@@ -76,9 +115,20 @@ export async function POST(request: NextRequest) {
         },
       },
     });
-    return NextResponse.json({ message: "Movie created successfully", movie }, { status: 201 });
+    return withCors(NextResponse.json({ message: "Movie created successfully", movie }, { status: 201 }));
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ message: "Error" }, { status: 500 });
+    return withCors(NextResponse.json({ message: "Error" }, { status: 500 }));
   }
+}
+
+export async function OPTIONS() {
+  return withCors(new NextResponse(null, { status: 204 }));
+}
+
+function withCors(res: NextResponse) {
+  res.headers.set("Access-Control-Allow-Origin", "*");
+  res.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.headers.set("Access-Control-Allow-Headers", "Content-Type");
+  return res;
 }

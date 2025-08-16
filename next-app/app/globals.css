@@ -1,6 +1,42 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@font-face {
+  font-family: "Jan";
+  font-weight: 100 900;
+  src: url(./assets/fonts/F37Jan-VF.woff2) format("woff2");
+}
+
+@font-face {
+  font-family: "Gruffy";
+  font-weight: 100 900;
+  src: url(./assets/fonts/F37Gruffy-VF.woff2) format("woff2");
+}
+
+@font-face {
+  font-family: "Hooj";
+  font-weight: 100 900;
+  src: url(./assets/fonts/Hooj-VF.woff2) format("woff2");
+}
+
+@font-face {
+  font-family: "Sonic";
+  font-weight: 100 900;
+  src: url(./assets/fonts/Sonic-VF.woff2) format("woff2");
+}
+
+@font-face {
+  font-family: "Randy";
+  font-weight: 100 900;
+  src: url(./assets/fonts/Randy-VF.woff2) format("woff2");
+}
+
+@font-face {
+  font-family: "BritainScotch";
+  font-weight: 100 900;
+  src: url(./assets/fonts/BritainScotch-VF.woff2) format("woff2");
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -110,6 +146,31 @@
   --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.551 0.027 264.364);
+}
+
+.Jan {
+  font-family: "Jan";
+}
+
+.Gruffy {
+  font-family: "Gruffy";
+}
+
+.Hooj {
+  font-family: "Hooj";
+}
+
+.Sonic {
+  font-family: "Sonic";
+  font-weight: 500;
+}
+
+.Randy {
+  font-family: "Randy";
+}
+
+.BritainScotch {
+  font-family: "BritainScotch";
 }
 
 @layer base {

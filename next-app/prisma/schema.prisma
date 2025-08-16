@@ -15,15 +15,16 @@ datasource db {
 }
 
 model Movie {
-  id         String   @id @unique @default(uuid())
-  title      String   @unique
-  url        String   @unique
+  id         String      @id @unique @default(uuid())
+  title      String      @unique
+  url        String      @unique
   coverImage String?
   coverTitle String?
   coverAlt   String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
   links      Link[]
+  DoubanInfo DoubanInfo?
 }
 
 model Link {
@@ -35,4 +36,15 @@ model Link {
   source   String
   magnet   String @unique
   download String @unique
+}
+
+model DoubanInfo {
+  id         String @id @unique @default(uuid())
+  movieId    String @unique
+  movie      Movie  @relation(fields: [movieId], references: [id])
+  url        String @unique
+  title      String
+  year       Int
+  rating     Float
+  coverImage String
 }

@@ -21,7 +21,8 @@
   "content_scripts": [
     {
       "matches": [
-        "https://en.rarbg-official.com/movies/*"
+        "https://en.rarbg-official.com/movies/*",
+        "https://movie.douban.com/subject/*"
       ],
       "js": [
         "dist/content.js"
