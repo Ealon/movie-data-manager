@@ -55,6 +55,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Pa
           {movies.map((movie) => {
             const searchWord = movie.url.split("/").pop()?.replaceAll("-", "+");
             const searchDoubanHref = `https://search.douban.com/movie/subject_search?search_text=${searchWord}`;
+            const coverImage = /thumbnail/gim.test(movie.coverImage ?? "") ? "/300x450.svg" : movie.coverImage;
             return (
               <div key={movie.id} className="rounded border border-slate-300 dark:border-white/10 overflow-hidden">
                 <div className="bg-gray-100 relative dark:bg-gray-900">
@@ -62,7 +63,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Pa
                     <Link className="w-full" style={{ aspectRatio: "2/3" }} href={movie.url} target="_blank">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={movie.coverImage}
+                        src={coverImage || "/300x450.svg"}
                         alt={movie.coverAlt ?? movie.title}
                         title={movie.coverTitle ?? movie.title}
                         className="w-full object-contain"
