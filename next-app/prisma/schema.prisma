@@ -18,6 +18,7 @@ model Movie {
   id         String      @id @unique @default(uuid())
   title      String      @unique
   url        String      @unique
+  year       Int?        @default(0)
   coverImage String?
   coverTitle String?
   coverAlt   String?
@@ -39,12 +40,12 @@ model Link {
 }
 
 model DoubanInfo {
-  id         String @id @unique @default(uuid())
-  movieId    String @unique
-  movie      Movie  @relation(fields: [movieId], references: [id])
-  url        String @unique
-  title      String
-  year       Int
-  rating     Float
-  coverImage String
+  id            String @id @unique @default(uuid())
+  movieId       String @unique
+  movie         Movie  @relation(fields: [movieId], references: [id])
+  url           String @unique
+  title         String
+  datePublished String
+  rating        Float
+  coverImage    String
 }

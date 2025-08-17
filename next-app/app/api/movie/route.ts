@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Link, PrismaClient } from "../../../generated/prisma";
+import { Link, PrismaClient } from "@/generated/prisma";
 import { sanitizeName } from "@/lib/utils";
 
 const prisma = new PrismaClient();
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
         download: typeof l?.download === "string" ? l.download : null,
       }))
       .filter((l) => l.quality && l.size && l.source && l.magnet && l.download);
-    // Check for existing movie by unique fields (e.g., title and url)
+
     const existingMovie = await prisma.movie.findUnique({
       where: {
         url: body.url,

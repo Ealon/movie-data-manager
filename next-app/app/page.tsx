@@ -1,6 +1,8 @@
 import Link from "next/link";
-import { PrismaClient } from "../generated/prisma";
-import { ExternalLink, MagnetIcon } from "lucide-react";
+import { PrismaClient } from "@/generated/prisma";
+import { ExternalLink, MagnetIcon, StarIcon } from "lucide-react";
+import { DoubanInfoUpdater } from "@/components/DoubanInfoUpdater";
+import { cn } from "@/lib/utils";
 
 type PageSearchParams = {
   page?: string;
@@ -24,7 +26,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Pa
     prisma.movie.count(),
     prisma.movie.findMany({
       orderBy: { createdAt: "desc" },
-      include: { links: { orderBy: { quality: "desc" } } },
+      include: { links: { orderBy: { quality: "desc" } }, DoubanInfo: true },
       skip,
       take: pageSize,
     }),
@@ -45,7 +47,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Pa
     <div className="min-h-screen p-6 sm:p-10">
       <div className="max-w-7xl mx-auto">
         <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-5xl font-black">Movies Database</h1>
+          <h1 className="text-5xl font-black text-white">Movies Database</h1>
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-500">Total: {totalMovies}</span>
           </div>
@@ -57,7 +59,10 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Pa
             const searchDoubanHref = `https://search.douban.com/movie/subject_search?search_text=${searchWord}`;
             const coverImage = /thumbnail/gim.test(movie.coverImage ?? "") ? "/300x450.svg" : movie.coverImage;
             return (
-              <div key={movie.id} className="rounded border border-slate-300 dark:border-white/10 overflow-hidden">
+              <div
+                key={movie.id}
+                className="rounded border border-slate-300 dark:border-white/10 overflow-hidden bg-white/60 backdrop-blur-md group"
+              >
                 <div className="bg-gray-100 relative dark:bg-gray-900">
                   {movie.coverImage ? (
                     <Link className="w-full" style={{ aspectRatio: "2/3" }} href={movie.url} target="_blank">
@@ -74,41 +79,60 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Pa
                       <div className="size-[64px] rounded bg-gray-300 dark:bg-gray-700" />
                     </div>
                   )}
-                  <div className="absolute bottom-0 left-0 w-full h-fit py-3 bg-gradient-to-t from-black/95 to-transparent via-black/70 flex items-center justify-center">
-                    <h2 className="text-white text-lg font-bold">{movie.title}</h2>
-                  </div>
-                </div>
-                <div className="p-4 flex flex-col gap-3">
-                  <div>
-                    <a
-                      href={searchDoubanHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs font-bold bg-green-600 text-white px-2 py-1 rounded-md hover:underline break-all flex items-center gap-1"
-                    >
-                      <span>豆瓣搜索</span>
-                      <ExternalLink className="size-3.5" />
-                    </a>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    {movie.links.map((l) => {
-                      const label = `${l.quality} (${l.source}) - ${l.size}`;
-                      const href = l.download ?? l.magnet ?? "#";
-
-                      return (
+                  <div className="absolute bottom-0 left-0 px-4 w-full h-fit pb-3 pt-12 bg-gradient-to-t from-black/95 to-transparent via-black/75 flex flex-col items-center justify-center gap-1.5">
+                    <h2 className="text-white text-lg text-center font-bold text-shadow-xs text-shadow-black/35">
+                      {movie.DoubanInfo?.title ?? movie.title}
+                    </h2>
+                    <p className="text-white text-sm flex items-center gap-2">
+                      {movie.year || movie.DoubanInfo?.datePublished || null}
+                      <StarIcon className="fill-yellow-400 stroke-0 size-4" />
+                      <span className="text-yellow-400">{movie.DoubanInfo?.rating ?? 0}</span>
+                      {movie.DoubanInfo?.url && (
                         <a
-                          key={l.id}
-                          href={href}
-                          className="flex items-center gap-1 text-indigo-600 underline font-medium underline-offset-2 text-sm hover:text-blue-500"
+                          href={`https://movie.douban.com${movie.DoubanInfo.url}`}
                           target="_blank"
                           rel="noopener noreferrer"
+                          className="text-xs font-black bg-green-600 text-white px-2 py-1 rounded-md hidden group-hover:block"
                         >
-                          <MagnetIcon className="size-4" />
-                          <span>{label}</span>
+                          豆瓣
                         </a>
-                      );
-                    })}
+                      )}
+                    </p>
+                    <div className="flex-col gap-2 text-sm hidden p-4 backdrop-blur-sm rounded-xl group-hover:flex">
+                      {movie.links.map((l) => {
+                        const label = `${l.quality} (${l.source}) - ${l.size}`;
+                        const href = l.download ?? l.magnet ?? "#";
+
+                        return (
+                          <a
+                            key={l.id}
+                            href={href}
+                            className={cn(
+                              "flex items-center gap-1  underline font-medium underline-offset-1 hover:text-blue-400",
+                              /(1080p)|(2160p)/gim.test(l.quality) && /blu/gim.test(l.source)
+                                ? "text-amber-500 hover:text-yellow-400"
+                                : "text-indigo-500 hover:text-blue-400",
+                            )}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <MagnetIcon className="size-4" />
+                            <span>{label}</span>
+                          </a>
+                        );
+                      })}
+                    </div>
+                    <div className=" items-center gap-2 hidden group-hover:flex">
+                      <a
+                        href={searchDoubanHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs font-black bg-green-600 text-white px-2 py-1 rounded-sm block"
+                      >
+                        在豆瓣搜索
+                      </a>
+                      <DoubanInfoUpdater movieId={movie.id} />
+                    </div>
                   </div>
                 </div>
               </div>
