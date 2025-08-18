@@ -3,6 +3,7 @@ import { PrismaClient } from "@/generated/prisma";
 import { MagnetIcon, StarIcon } from "lucide-react";
 import { DoubanInfoUpdater } from "@/components/DoubanInfoUpdater";
 import { cn } from "@/lib/utils";
+import Pagination from "@/components/Pagination";
 
 type PageSearchParams = {
   page?: string;
@@ -53,6 +54,16 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Pa
           </div>
         </div>
 
+        <div>
+          <Pagination
+            pathname="/"
+            pageSize={pageSize}
+            className="mt-6"
+            totalPages={totalPages}
+            currentPage={currentPage}
+          />
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
           {movies.map((movie) => {
             const searchWord = movie.url.split("/").pop()?.replaceAll("-", "+");
@@ -65,13 +76,13 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Pa
               >
                 <div className="bg-gray-100 relative dark:bg-gray-900">
                   {movie.coverImage ? (
-                    <Link className="w-full" style={{ aspectRatio: "2/3" }} href={movie.url} target="_blank">
+                    <Link className="w-full" href={movie.url} target="_blank">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={coverImage || "/300x450.svg"}
                         alt={movie.coverAlt ?? movie.title}
                         title={movie.coverTitle ?? movie.title}
-                        className="w-full object-contain"
+                        className="w-full object-contain aspect-[2/3] bg-[url('/300x450.svg')]"
                       />
                     </Link>
                   ) : (
