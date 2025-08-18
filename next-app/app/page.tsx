@@ -1,13 +1,15 @@
 import Link from "next/link";
-import { PrismaClient } from "@/generated/prisma";
+import { Prisma, PrismaClient } from "@/generated/prisma";
 import { MagnetIcon, StarIcon } from "lucide-react";
 import { DoubanInfoUpdater } from "@/components/DoubanInfoUpdater";
 import { cn } from "@/lib/utils";
 import Pagination from "@/components/Pagination";
+import Search from "@/components/search";
 
 type PageSearchParams = {
   page?: string;
   pageSize?: string;
+  keyword?: string;
 };
 
 const prisma = new PrismaClient();
@@ -22,11 +24,24 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Pa
   const currentPage = parsePositiveInt(_searchParams?.page, 1);
   const pageSize = parsePositiveInt(_searchParams?.pageSize, 12);
   const skip = (currentPage - 1) * pageSize;
+  const keyword = _searchParams?.keyword;
+
+  const where: Prisma.MovieWhereInput | undefined = keyword
+    ? {
+        OR: [
+          { title: { contains: keyword, mode: "insensitive" } },
+          { DoubanInfo: { title: { contains: keyword, mode: "insensitive" } } },
+        ],
+      }
+    : undefined;
 
   const [totalMovies, movies] = await Promise.all([
-    prisma.movie.count(),
+    prisma.movie.count({
+      where,
+    }),
     prisma.movie.findMany({
-      orderBy: { createdAt: "desc" },
+      where,
+      orderBy: { DoubanInfo: { rating: "desc" } },
       include: { links: { orderBy: { quality: "desc" } }, DoubanInfo: true },
       skip,
       take: pageSize,
@@ -34,23 +49,17 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Pa
   ]);
 
   const totalPages = Math.max(1, Math.ceil(totalMovies / pageSize));
-  const hasPrev = currentPage > 1;
-  const hasNext = currentPage < totalPages;
-
-  function pageHref(page: number) {
-    const params = new URLSearchParams();
-    params.set("page", String(page));
-    params.set("pageSize", String(pageSize));
-    return `/?${params.toString()}`;
-  }
 
   return (
     <div className="min-h-screen p-6 sm:p-10">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-5xl font-black text-white">Movies Database</h1>
+        <div className="mb-6 flex items-center justify-between gap-4">
+          <Link href="/">
+            <h1 className="text-5xl font-black text-white">Movies Database</h1>
+          </Link>
+          <Search queryName="keyword" placeholder="Search by title..." />
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">Total: {totalMovies}</span>
+            <span className="text-sm font-bold text-gray-100">Total: {totalMovies}</span>
           </div>
         </div>
 
@@ -58,7 +67,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Pa
           <Pagination
             pathname="/"
             pageSize={pageSize}
-            className="mt-6"
+            className="my-2 p-2 w-fit mx-auto rounded-lg bg-white/20 backdrop-blur-md"
             totalPages={totalPages}
             currentPage={currentPage}
           />
@@ -151,34 +160,14 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Pa
           })}
         </div>
 
-        <div className="mt-8 flex items-center justify-between">
-          <div className="text-sm text-gray-500">
-            Page {currentPage} of {totalPages}
-          </div>
-          <div className="flex items-center gap-2">
-            <Link
-              href={hasPrev ? pageHref(currentPage - 1) : "#"}
-              className={`px-3 py-1 rounded border ${
-                hasPrev
-                  ? "border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
-                  : "border-gray-200 text-gray-400 cursor-not-allowed"
-              }`}
-              aria-disabled={!hasPrev}
-            >
-              Prev
-            </Link>
-            <Link
-              href={hasNext ? pageHref(currentPage + 1) : "#"}
-              className={`px-3 py-1 rounded border ${
-                hasNext
-                  ? "border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
-                  : "border-gray-200 text-gray-400 cursor-not-allowed"
-              }`}
-              aria-disabled={!hasNext}
-            >
-              Next
-            </Link>
-          </div>
+        <div>
+          <Pagination
+            pathname="/"
+            pageSize={pageSize}
+            className="my-2 p-2 w-fit mx-auto rounded-lg bg-white/20 backdrop-blur-md"
+            totalPages={totalPages}
+            currentPage={currentPage}
+          />
         </div>
       </div>
     </div>
