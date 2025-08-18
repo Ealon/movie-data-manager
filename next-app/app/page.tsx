@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PrismaClient } from "@/generated/prisma";
-import { ExternalLink, MagnetIcon, StarIcon } from "lucide-react";
+import { MagnetIcon, StarIcon } from "lucide-react";
 import { DoubanInfoUpdater } from "@/components/DoubanInfoUpdater";
 import { cn } from "@/lib/utils";
 

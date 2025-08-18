@@ -6,7 +6,7 @@ import { PrismaClient } from "@/generated/prisma";
 
 const prisma = new PrismaClient();
 
-export async function updateDoubanInfo(formData: FormData) {
+export async function updateDoubanInfo(formData: FormData): Promise<void> {
   const movieId = formData.get("movieId") as string;
   const jsonInfo = formData.get("json-info") as string;
 
@@ -15,28 +15,31 @@ export async function updateDoubanInfo(formData: FormData) {
   });
 
   if (!movie) {
-    return { ok: false, error: "Movie not found" };
+    // return { ok: false, error: "Movie not found" };
+    return;
   }
 
   let parsed: unknown;
   try {
     parsed = JSON.parse(jsonInfo);
   } catch {
-    return { ok: false, error: "Invalid JSON payload" };
+    // return { ok: false, error: "Invalid JSON payload" };
+    return;
   }
 
   const doubanMovie = parsed as DoubanMovie;
   const yearMatch = doubanMovie.datePublished.match(/\d{4}/);
   const year = yearMatch ? +yearMatch[0] : 0;
 
-  if (year > 0 && movie.year !== year) {
+  if (year > 0 && movie?.year !== year) {
     await prisma.movie.update({
       where: { id: movieId },
       data: { year },
     });
   }
 
-  const doubanInfo = await prisma.doubanInfo.upsert({
+  // const doubanInfo =
+  await prisma.doubanInfo.upsert({
     where: { movieId },
     update: {
       url: doubanMovie.url,
@@ -57,5 +60,6 @@ export async function updateDoubanInfo(formData: FormData) {
 
   revalidatePath("/", "page");
 
-  return { ok: true, data: doubanInfo };
+  // return { ok: true, data: doubanInfo };
+  return;
 }

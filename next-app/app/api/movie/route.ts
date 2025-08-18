@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     }
     const links = Array.isArray(body.links) ? body.links : [];
     const normalizedLinks = links
-      .map((l: any) => ({
+      .map((l: Link) => ({
         quality: String(l?.quality || "").trim(),
         size: String(l?.size || "").trim(),
         source: String(l?.source || "")
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
         magnet: typeof l?.magnet === "string" ? l.magnet : null,
         download: typeof l?.download === "string" ? l.download : null,
       }))
-      .filter((l) => l.quality && l.size && l.source && l.magnet && l.download);
+      .filter((l: Link) => l.quality && l.size && l.source && l.magnet && l.download);
 
     const existingMovie = await prisma.movie.findUnique({
       where: {
