@@ -53,7 +53,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Pa
 
   return (
     <div className="max-w-[1920px] mx-auto p-6 flex flex-col justify-between min-h-screen w-full items-center">
-      <div className="mb-6 flex items-center justify-between gap-4">
+      <div className="mb-6 w-fit flex items-center justify-between gap-12">
         <Link href="/">
           <h1 className="text-5xl font-black text-white">Movies Database</h1>
         </Link>
