@@ -15,6 +15,7 @@ interface LinkInfo {
 interface ExtractedData {
   title: string;
   url: string;
+  year: number;
   coverImage: CoverImageInfo | null;
   links: LinkInfo[];
 }
@@ -97,6 +98,8 @@ function main(): void {
   async function extractMovieDataFromTable(table: Element): Promise<ExtractedData> {
     const rows = table.querySelectorAll("tbody tr");
     const links: LinkInfo[] = [];
+    const _title = document.querySelector("h1")?.textContent?.trim() || "";
+    const _year = document.querySelector("h2")?.textContent?.trim() || "";
 
     rows.forEach((row) => {
       const cells = row.querySelectorAll<HTMLTableCellElement>("td");
@@ -124,8 +127,9 @@ function main(): void {
 
     const coverImage = await getCoverImageInfo();
     const data: ExtractedData = {
-      title: sanitizeName(document.title),
+      title: _title || sanitizeName(document.title),
       url: window.location.href,
+      year: _year ? +_year : 9999,
       coverImage,
       links,
     };
@@ -277,6 +281,7 @@ function main(): void {
         }
         const result = await response.json();
         logger("Server Response:", JSON.stringify(result, null, 2));
+        // window.close();
       } catch (error) {
         logger("Error:", error);
       }

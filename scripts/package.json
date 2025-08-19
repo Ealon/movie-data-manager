@@ -1,0 +1,19 @@
+{
+  "name": "movie-data-manager-scripts",
+  "private": true,
+  "type": "module",
+  "packageManager": "yarn@1.22.22",
+  "scripts": {
+    "start": "tsx douban-crawl.ts",
+    "dev": "tsx watch douban-crawl.ts",
+    "postinstall": "playwright install chromium"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.1",
+    "playwright": "^1.54.2",
+    "tsx": "^4.20.4"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0"
+  }
+}

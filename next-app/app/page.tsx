@@ -30,7 +30,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Pa
     ? {
         OR: [
           { title: { contains: keyword, mode: "insensitive" } },
-          { DoubanInfo: { title: { contains: keyword, mode: "insensitive" } } },
+          { doubanInfo: { title: { contains: keyword, mode: "insensitive" } } },
         ],
       }
     : undefined;
@@ -41,8 +41,9 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Pa
     }),
     prisma.movie.findMany({
       where,
-      orderBy: { DoubanInfo: { rating: "desc" } },
-      include: { links: { orderBy: { quality: "desc" } }, DoubanInfo: true },
+      // orderBy: { doubanInfo: { rating: "desc" } },
+      orderBy: { updatedAt: "desc" },
+      include: { links: { orderBy: { quality: "desc" } }, doubanInfo: true },
       skip,
       take: pageSize,
     }),
@@ -75,7 +76,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Pa
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
           {movies.map((movie) => {
-            const searchWord = movie.url.split("/").pop()?.replaceAll("-", "+");
+            const searchWord = movie.url.split("/").pop()?.replaceAll("-", "+").replaceAll("+idvc100", "");
             const searchDoubanHref = `https://search.douban.com/movie/subject_search?search_text=${searchWord}`;
             const coverImage = /thumbnail/gim.test(movie.coverImage ?? "") ? "/300x450.svg" : movie.coverImage;
             return (
@@ -101,15 +102,15 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Pa
                   )}
                   <div className="absolute bottom-0 left-0 px-4 w-full h-fit pb-3 pt-12 bg-gradient-to-t from-black/95 to-transparent via-black/75 flex flex-col items-center justify-center gap-1.5">
                     <h2 className="text-white text-lg text-center font-bold text-shadow-xs text-shadow-black/35">
-                      {movie.DoubanInfo?.title ?? movie.title}
+                      {movie.doubanInfo?.title ?? movie.title}
                     </h2>
                     <p className="text-white text-sm flex items-center gap-2">
-                      {movie.year || movie.DoubanInfo?.datePublished || null}
+                      {movie.year || movie.doubanInfo?.datePublished || null}
                       <StarIcon className="fill-yellow-400 stroke-0 size-4" />
-                      <span className="text-yellow-400">{movie.DoubanInfo?.rating ?? 0}</span>
-                      {movie.DoubanInfo?.url && (
+                      <span className="text-yellow-400">{movie.doubanInfo?.rating ?? 0}</span>
+                      {movie.doubanInfo?.url && (
                         <a
-                          href={`https://movie.douban.com${movie.DoubanInfo.url}`}
+                          href={`https://movie.douban.com${movie.doubanInfo.url}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-xs font-black bg-green-600 text-white px-2 py-1 rounded-md hidden group-hover:block"
@@ -142,17 +143,19 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Pa
                         );
                       })}
                     </div>
-                    <div className=" items-center gap-2 hidden group-hover:flex">
-                      <a
-                        href={searchDoubanHref}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs font-black bg-green-600 text-white px-2 py-1 rounded-sm block"
-                      >
-                        在豆瓣搜索
-                      </a>
-                      <DoubanInfoUpdater movieId={movie.id} />
-                    </div>
+                    {false && (
+                      <div className=" items-center gap-2 hidden group-hover:flex">
+                        <a
+                          href={searchDoubanHref}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs font-black bg-green-600 text-white px-2 py-1 rounded-sm block"
+                        >
+                          在豆瓣搜索
+                        </a>
+                        <DoubanInfoUpdater movieId={movie.id} />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

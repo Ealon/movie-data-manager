@@ -25,7 +25,7 @@ model Movie {
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
   links      Link[]
-  DoubanInfo DoubanInfo?
+  doubanInfo DoubanInfo?
 }
 
 model Link {

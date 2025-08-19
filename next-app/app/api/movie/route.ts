@@ -55,7 +55,8 @@ export async function POST(request: NextRequest) {
           existingMovie.coverImage !== body.coverImage?.src ||
           existingMovie.coverTitle !== sanitizeName(body.coverImage?.title) ||
           existingMovie.coverAlt !== sanitizeName(body.coverImage?.alt) ||
-          existingMovie.title !== sanitizeName(body.title)
+          existingMovie.title !== sanitizeName(body.title) ||
+          existingMovie.year !== body.year
         ) {
           await prisma.movie.update({
             where: { id: existingMovie.id },
@@ -64,6 +65,7 @@ export async function POST(request: NextRequest) {
               coverTitle: sanitizeName(body.coverImage?.title),
               coverAlt: sanitizeName(body.coverImage?.alt),
               title: sanitizeName(body.title),
+              year: body.year,
             },
           });
         }
@@ -78,6 +80,7 @@ export async function POST(request: NextRequest) {
         where: { id: existingMovie.id },
         data: {
           coverImage: body.coverImage?.src,
+          year: body.year,
           coverTitle: sanitizeName(body.coverImage?.title),
           coverAlt: sanitizeName(body.coverImage?.alt),
           title: sanitizeName(body.title),
@@ -102,6 +105,7 @@ export async function POST(request: NextRequest) {
         title: sanitizeName(body.title),
         url: body.url,
         coverImage: body.coverImage?.src,
+        year: body.year,
         coverTitle: sanitizeName(body.coverImage?.title),
         coverAlt: sanitizeName(body.coverImage?.alt),
         links: {
