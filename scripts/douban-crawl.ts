@@ -231,8 +231,8 @@ async function processMovie(page: Page, movieId: string): Promise<void> {
       return;
     }
 
-    // Throttle: randomized 15-20s
-    const sleepMs = 15000 + Math.floor(Math.random() * 5000);
+    // Throttle: randomized 30-40s
+    const sleepMs = 30_000 + Math.floor(Math.random() * 10_000);
     await delay(sleepMs);
   } catch (err: any) {
     appendLog(`Unexpected error processing movieId=${movieId}: ${err?.message || String(err)}`);

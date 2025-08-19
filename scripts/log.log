@@ -33,3 +33,19 @@ Call log:
 [2025-08-19T08:14:24.180Z] Saved screenshot for 'Silent Hill' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Silent Hill.png
 [2025-08-19T08:14:24.180Z] Error fetching Douban info (attempt 1/3) for 'Silent Hill': Search result selector not found
 [2025-08-19T08:14:32.425Z] Error fetching Douban info (attempt 2/3) for 'Silent Hill': page.screenshot: Target page, context or browser has been closed
+[2025-08-19T08:25:53.914Z] Using custom user-agent from DOUBAN_USER_AGENT.
+[2025-08-19T08:26:03.741Z] Title mismatch for 'Midnight Screenings Harry Potter and the Deathly Hallows, Part 2': not found in douban title/details
+[2025-08-19T08:26:19.936Z] Year mismatch for 'Mulholland Dr.': db=1999, douban=2001
+[2025-08-19T08:26:54.797Z] Saved screenshot for 'Sex, Lies, and Videotape' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Sex, Lies, and Videotape.png
+[2025-08-19T08:26:54.798Z] Error fetching Douban info (attempt 1/3) for 'Sex, Lies, and Videotape': Search result selector not found
+[2025-08-19T08:27:35.273Z] Saved screenshot for 'Sex, Lies, and Videotape' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Sex, Lies, and Videotape.png
+[2025-08-19T08:27:35.274Z] Error fetching Douban info (attempt 2/3) for 'Sex, Lies, and Videotape': Search result selector not found
+[2025-08-19T08:28:06.382Z] Saved screenshot for 'Silent Hill' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Silent Hill.png
+[2025-08-19T08:28:06.382Z] Error fetching Douban info (attempt 1/3) for 'Silent Hill': Search result selector not found
+[2025-08-19T08:28:46.859Z] Saved screenshot for 'Silent Hill' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Silent Hill.png
+[2025-08-19T08:28:46.859Z] Error fetching Douban info (attempt 2/3) for 'Silent Hill': Search result selector not found
+[2025-08-19T08:29:17.843Z] Saved screenshot for 'Post Malone: On His Terms' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Post Malone: On His Terms.png
+[2025-08-19T08:29:17.843Z] Error fetching Douban info (attempt 1/3) for 'Post Malone: On His Terms': Search result selector not found
+[2025-08-19T08:29:58.327Z] Saved screenshot for 'Post Malone: On His Terms' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Post Malone: On His Terms.png
+[2025-08-19T08:29:58.328Z] Error fetching Douban info (attempt 2/3) for 'Post Malone: On His Terms': Search result selector not found
+[2025-08-19T08:30:15.864Z] Error fetching Douban info (attempt 1/3) for 'The Hidden Face': page.screenshot: Target page, context or browser has been closed
