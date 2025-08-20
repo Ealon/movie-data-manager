@@ -108,17 +108,14 @@ const Pagination = ({
   const nextPageHref = nextPage <= totalPages ? generateHref(pathname, nextPage, pageSize, searchParams) : "#";
 
   return (
-    <PaginationComponent
-      className={className}
-      {...props}
-    >
+    <PaginationComponent className={className} {...props}>
       <PaginationContent>
         <PaginationItem>
           <PaginationPrevious href={prevPageHref} />
         </PaginationItem>
         {paginationRange.map((item) => {
           if (item === "..." || item === "..") {
-            return <PaginationEllipsis key={item} />;
+            return <PaginationEllipsis className="text-white" key={item} />;
           }
           return (
             <PaginationItem key={item}>

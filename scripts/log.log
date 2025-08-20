@@ -1,2 +1,146 @@
 [2025-08-19T13:46:22.540Z] Year mismatch for 'Mulholland Dr.': db=1999, douban=2001
 [2025-08-19T14:02:08.784Z] Year mismatch for 'Taylor Swift: The 1989 World Tour Live': db=1989, douban=2015
+[2025-08-19T14:04:37.342Z] Saved screenshot for 'A Frozen Flower' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/A Frozen Flower.png
+[2025-08-19T14:04:37.342Z] Error fetching Douban info (attempt 1/3) for 'A Frozen Flower': Search result selector not found
+[2025-08-19T14:05:18.102Z] Saved screenshot for 'A Frozen Flower' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/A Frozen Flower.png
+[2025-08-19T14:05:18.102Z] Error fetching Douban info (attempt 2/3) for 'A Frozen Flower': Search result selector not found
+[2025-08-19T14:06:30.861Z] Saved screenshot for 'Irreversible' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Irreversible.png
+[2025-08-19T14:06:30.862Z] Error fetching Douban info (attempt 1/3) for 'Irreversible': Search result selector not found
+[2025-08-19T14:07:11.482Z] Saved screenshot for 'Irreversible' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Irreversible.png
+[2025-08-19T14:07:11.482Z] Error fetching Douban info (attempt 2/3) for 'Irreversible': Search result selector not found
+[2025-08-19T14:07:15.614Z] Title mismatch for 'Your Name.': not found in douban title/details
+[2025-08-19T14:07:20.143Z] Year mismatch for 'A Taxi Driver': db=2017, douban=2018
+[2025-08-19T14:12:43.785Z] Title mismatch for 'The Day the Music Died/American Pie': not found in douban title/details
+[2025-08-19T14:12:47.456Z] Title mismatch for 'American Pie Presents: The Book of Love': not found in douban title/details
+[2025-08-19T14:13:24.468Z] Title mismatch for 'American Pie Presents: Beta House': not found in douban title/details
+[2025-08-19T14:13:28.410Z] Title mismatch for 'American Pie Presents: The Naked Mile': not found in douban title/details
+[2025-08-19T14:13:32.219Z] Title mismatch for 'American Pie Presents: Band Camp': not found in douban title/details
+[2025-08-19T14:20:25.217Z] Saved screenshot for 'The Lord of the Rings: The Fellowship of the Ring' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/The Lord of the Rings: The Fellowship of the Ring.png
+[2025-08-19T14:20:25.217Z] Error fetching Douban info (attempt 1/3) for 'The Lord of the Rings: The Fellowship of the Ring': Search result selector not found
+[2025-08-19T23:10:56.440Z] Using custom user-agent from DOUBAN_USER_AGENT.
+[2025-08-19T23:11:06.393Z] Title mismatch for 'Midnight Screenings Harry Potter and the Deathly Hallows, Part 2': not found in douban title/details
+[2025-08-19T23:11:13.134Z] Year mismatch for 'Mulholland Dr.': db=1999, douban=2001
+[2025-08-19T23:11:19.077Z] Year mismatch for 'Taylor Swift: The 1989 World Tour Live': db=1989, douban=2015
+[2025-08-19T23:11:50.235Z] Saved screenshot for 'A Frozen Flower' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/A Frozen Flower.png
+[2025-08-19T23:11:50.235Z] Error fetching Douban info (attempt 1/3) for 'A Frozen Flower': Search result selector not found
+[2025-08-19T23:12:30.859Z] Saved screenshot for 'A Frozen Flower' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/A Frozen Flower.png
+[2025-08-19T23:12:30.859Z] Error fetching Douban info (attempt 2/3) for 'A Frozen Flower': Search result selector not found
+[2025-08-19T23:13:01.641Z] Saved screenshot for 'Irreversible' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Irreversible.png
+[2025-08-19T23:13:01.641Z] Error fetching Douban info (attempt 1/3) for 'Irreversible': Search result selector not found
+[2025-08-19T23:13:42.226Z] Saved screenshot for 'Irreversible' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Irreversible.png
+[2025-08-19T23:13:42.226Z] Error fetching Douban info (attempt 2/3) for 'Irreversible': Search result selector not found
+[2025-08-19T23:13:45.187Z] Title mismatch for 'Your Name.': not found in douban title/details
+[2025-08-19T23:13:47.848Z] Year mismatch for 'A Taxi Driver': db=2017, douban=2018
+[2025-08-19T23:13:50.818Z] Title mismatch for 'The Day the Music Died/American Pie': not found in douban title/details
+[2025-08-19T23:13:53.784Z] Title mismatch for 'American Pie Presents: The Book of Love': not found in douban title/details
+[2025-08-19T23:13:57.644Z] Title mismatch for 'American Pie Presents: Beta House': not found in douban title/details
+[2025-08-19T23:14:28.236Z] Saved screenshot for 'American Pie Presents: The Naked Mile' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/American Pie Presents: The Naked Mile.png
+[2025-08-19T23:14:28.236Z] Error fetching Douban info (attempt 1/3) for 'American Pie Presents: The Naked Mile': Search result selector not found
+[2025-08-19T23:14:41.832Z] Title mismatch for 'American Pie Presents: The Naked Mile': not found in douban title/details
+[2025-08-19T23:14:44.778Z] Title mismatch for 'American Pie Presents: Band Camp': not found in douban title/details
+[2025-08-19T23:18:27.177Z] Saved screenshot for 'One Flew Over the Cuckoo's Nest' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/One Flew Over the Cuckoo's Nest.png
+[2025-08-19T23:18:27.177Z] Error fetching Douban info (attempt 1/3) for 'One Flew Over the Cuckoo's Nest': Search result selector not found
+[2025-08-19T23:19:07.689Z] Saved screenshot for 'One Flew Over the Cuckoo's Nest' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/One Flew Over the Cuckoo's Nest.png
+[2025-08-19T23:19:07.689Z] Error fetching Douban info (attempt 2/3) for 'One Flew Over the Cuckoo's Nest': Search result selector not found
+[2025-08-19T23:19:38.291Z] Saved screenshot for 'The Science of Interstellar' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/The Science of Interstellar.png
+[2025-08-19T23:19:38.292Z] Error fetching Douban info (attempt 1/3) for 'The Science of Interstellar': Search result selector not found
+[2025-08-19T23:20:18.813Z] Saved screenshot for 'The Science of Interstellar' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/The Science of Interstellar.png
+[2025-08-19T23:20:18.813Z] Error fetching Douban info (attempt 2/3) for 'The Science of Interstellar': Search result selector not found
+[2025-08-19T23:27:13.290Z] Saved screenshot for 'The Lion King' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/The Lion King.png
+[2025-08-19T23:27:13.290Z] Error fetching Douban info (attempt 1/3) for 'The Lion King': Search result selector not found
+[2025-08-19T23:27:53.836Z] Saved screenshot for 'The Lion King' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/The Lion King.png
+[2025-08-19T23:27:53.836Z] Error fetching Douban info (attempt 2/3) for 'The Lion King': Search result selector not found
+[2025-08-19T23:28:24.431Z] Saved screenshot for 'The Lion King II: Simba's Pride' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/The Lion King II: Simba's Pride.png
+[2025-08-19T23:28:24.432Z] Error fetching Douban info (attempt 1/3) for 'The Lion King II: Simba's Pride': Search result selector not found
+[2025-08-19T23:29:05.004Z] Saved screenshot for 'The Lion King II: Simba's Pride' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/The Lion King II: Simba's Pride.png
+[2025-08-19T23:29:05.006Z] Error fetching Douban info (attempt 2/3) for 'The Lion King II: Simba's Pride': Search result selector not found
+[2025-08-19T23:29:35.585Z] Saved screenshot for 'The Lion King 3: Hakuna Matata' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/The Lion King 3: Hakuna Matata.png
+[2025-08-19T23:29:35.585Z] Error fetching Douban info (attempt 1/3) for 'The Lion King 3: Hakuna Matata': Search result selector not found
+[2025-08-19T23:29:47.636Z] Error fetching Douban info (attempt 2/3) for 'The Lion King 3: Hakuna Matata': page.screenshot: Target page, context or browser has been closed
+[2025-08-20T00:25:18.603Z] Using custom user-agent from DOUBAN_USER_AGENT.
+[2025-08-20T00:25:35.614Z] Year mismatch for 'Taylor Swift: The 1989 World Tour Live': db=1989, douban=2015
+[2025-08-20T00:25:39.399Z] Title mismatch for 'Your Name.': not found in douban title/details
+[2025-08-20T00:25:42.460Z] Year mismatch for 'A Taxi Driver': db=2017, douban=2018
+[2025-08-20T00:26:26.046Z] Year mismatch for 'The Science of Interstellar': db=2015, douban=2014
+[2025-08-20T00:27:44.281Z] Title mismatch for 'The Lion King 3: Hakuna Matata': not found in douban title/details
+[2025-08-20T00:30:22.144Z] Using custom user-agent from DOUBAN_USER_AGENT.
+[2025-08-20T00:31:01.351Z] Year mismatch for 'Taylor Swift: The 1989 World Tour Live': db=1989, douban=2015
+[2025-08-20T00:31:07.608Z] Title mismatch for 'Your Name.': not found in douban title/details
+[2025-08-20T00:31:10.285Z] Year mismatch for 'A Taxi Driver': db=2017, douban=2018
+[2025-08-20T00:31:29.250Z] Title mismatch for 'The Lion King 3: Hakuna Matata': not found in douban title/details
+[2025-08-20T00:31:32.365Z] Year mismatch for 'Gladiator': db=2000, douban=1994
+[2025-08-20T00:32:51.037Z] Title mismatch for 'Spirited Away: Live on Stage': not found in douban title/details
+[2025-08-20T00:35:34.792Z] Year mismatch for 'Star Wars: Star Warriors': db=2007, douban=1977
+[2025-08-20T00:36:05.505Z] Saved screenshot for 'Star Wars: The Last Jedi Cast Live Q&A' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Star Wars: The Last Jedi Cast Live Q&A.png
+[2025-08-20T00:36:05.505Z] Error fetching Douban info (attempt 1/3) for 'Star Wars: The Last Jedi Cast Live Q&A': Search result selector not found
+[2025-08-20T00:36:46.129Z] Saved screenshot for 'Star Wars: The Last Jedi Cast Live Q&A' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Star Wars: The Last Jedi Cast Live Q&A.png
+[2025-08-20T00:36:46.130Z] Error fetching Douban info (attempt 2/3) for 'Star Wars: The Last Jedi Cast Live Q&A': Search result selector not found
+[2025-08-20T00:38:00.065Z] Title mismatch for 'Robot Chicken: Star Wars III': not found in douban title/details
+[2025-08-20T00:38:02.651Z] Title mismatch for 'Zoom In Solo A Star Wars Story': not found in douban title/details
+[2025-08-20T00:38:05.617Z] Year mismatch for 'Doraemon the Movie: Nobita's Little Star Wars 2021': db=2021, douban=2022
+[2025-08-20T00:38:36.179Z] Saved screenshot for 'The Star Wars Holiday Special' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/The Star Wars Holiday Special.png
+[2025-08-20T00:38:36.179Z] Error fetching Douban info (attempt 1/3) for 'The Star Wars Holiday Special': Search result selector not found
+[2025-08-20T00:39:16.663Z] Saved screenshot for 'The Star Wars Holiday Special' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/The Star Wars Holiday Special.png
+[2025-08-20T00:39:16.664Z] Error fetching Douban info (attempt 2/3) for 'The Star Wars Holiday Special': Search result selector not found
+[2025-08-20T00:39:47.235Z] Saved screenshot for 'Lego Star Wars Summer Vacation' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Lego Star Wars Summer Vacation.png
+[2025-08-20T00:39:47.235Z] Error fetching Douban info (attempt 1/3) for 'Lego Star Wars Summer Vacation': Search result selector not found
+[2025-08-20T00:40:27.913Z] Saved screenshot for 'Lego Star Wars Summer Vacation' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Lego Star Wars Summer Vacation.png
+[2025-08-20T00:40:27.913Z] Error fetching Douban info (attempt 2/3) for 'Lego Star Wars Summer Vacation': Search result selector not found
+[2025-08-20T00:44:12.741Z] Title mismatch for 'World Premiere 'Star Wars III: Revenge of the Sith'': not found in douban title/details
+[2025-08-20T00:44:15.897Z] Title mismatch for 'Star Wars: Episode IX - The Rise of Skywalker': not found in douban title/details
+[2025-08-20T00:45:00.484Z] Title mismatch for 'Star Wars: The Force and the Fury': not found in douban title/details
+[2025-08-20T00:45:31.136Z] Saved screenshot for 'Solo: A Star Wars Story' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Solo: A Star Wars Story.png
+[2025-08-20T00:45:31.136Z] Error fetching Douban info (attempt 1/3) for 'Solo: A Star Wars Story': Search result selector not found
+[2025-08-20T00:46:11.688Z] Saved screenshot for 'Solo: A Star Wars Story' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Solo: A Star Wars Story.png
+[2025-08-20T00:46:11.688Z] Error fetching Douban info (attempt 2/3) for 'Solo: A Star Wars Story': Search result selector not found
+[2025-08-20T00:46:42.816Z] Saved screenshot for 'Star Wars: Episode VI - Return of the Jedi' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Star Wars: Episode VI - Return of the Jedi.png
+[2025-08-20T00:46:42.816Z] Error fetching Douban info (attempt 1/3) for 'Star Wars: Episode VI - Return of the Jedi': Search result selector not found
+[2025-08-20T00:47:23.369Z] Saved screenshot for 'Star Wars: Episode VI - Return of the Jedi' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Star Wars: Episode VI - Return of the Jedi.png
+[2025-08-20T00:47:23.369Z] Error fetching Douban info (attempt 2/3) for 'Star Wars: Episode VI - Return of the Jedi': Search result selector not found
+[2025-08-20T00:47:53.947Z] Saved screenshot for 'Star Wars: Episode VIII - The Last Jedi' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Star Wars: Episode VIII - The Last Jedi.png
+[2025-08-20T00:47:53.947Z] Error fetching Douban info (attempt 1/3) for 'Star Wars: Episode VIII - The Last Jedi': Search result selector not found
+[2025-08-20T00:48:34.485Z] Saved screenshot for 'Star Wars: Episode VIII - The Last Jedi' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Star Wars: Episode VIII - The Last Jedi.png
+[2025-08-20T00:48:34.485Z] Error fetching Douban info (attempt 2/3) for 'Star Wars: Episode VIII - The Last Jedi': Search result selector not found
+[2025-08-20T00:49:05.067Z] Saved screenshot for 'Star Wars: Episode II - Attack of the Clones' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Star Wars: Episode II - Attack of the Clones.png
+[2025-08-20T00:49:05.068Z] Error fetching Douban info (attempt 1/3) for 'Star Wars: Episode II - Attack of the Clones': Search result selector not found
+[2025-08-20T00:49:45.550Z] Saved screenshot for 'Star Wars: Episode II - Attack of the Clones' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Star Wars: Episode II - Attack of the Clones.png
+[2025-08-20T00:49:45.550Z] Error fetching Douban info (attempt 2/3) for 'Star Wars: Episode II - Attack of the Clones': Search result selector not found
+[2025-08-20T00:50:16.175Z] Saved screenshot for 'Star Wars' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Star Wars.png
+[2025-08-20T00:50:16.175Z] Error fetching Douban info (attempt 1/3) for 'Star Wars': Search result selector not found
+[2025-08-20T00:54:01.654Z] Saved screenshot for 'Casablanca' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Casablanca.png
+[2025-08-20T00:54:01.654Z] Error fetching Douban info (attempt 1/3) for 'Casablanca': Search result selector not found
+[2025-08-20T00:54:42.252Z] Saved screenshot for 'Casablanca' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Casablanca.png
+[2025-08-20T00:54:42.252Z] Error fetching Douban info (attempt 2/3) for 'Casablanca': Search result selector not found
+[2025-08-20T00:55:12.858Z] Saved screenshot for 'Spider-Man: Across the Spider-Verse' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Spider-Man: Across the Spider-Verse.png
+[2025-08-20T00:55:12.858Z] Error fetching Douban info (attempt 1/3) for 'Spider-Man: Across the Spider-Verse': Search result selector not found
+[2025-08-20T00:55:53.421Z] Saved screenshot for 'Spider-Man: Across the Spider-Verse' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Spider-Man: Across the Spider-Verse.png
+[2025-08-20T00:55:53.421Z] Error fetching Douban info (attempt 2/3) for 'Spider-Man: Across the Spider-Verse': Search result selector not found
+[2025-08-20T00:56:24.017Z] Saved screenshot for 'Léon: The Professional' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Léon: The Professional.png
+[2025-08-20T00:56:24.017Z] Error fetching Douban info (attempt 1/3) for 'Léon: The Professional': Search result selector not found
+[2025-08-20T00:57:04.685Z] Saved screenshot for 'Léon: The Professional' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Léon: The Professional.png
+[2025-08-20T00:57:04.685Z] Error fetching Douban info (attempt 2/3) for 'Léon: The Professional': Search result selector not found
+[2025-08-20T00:57:35.561Z] Saved screenshot for 'American History X' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/American History X.png
+[2025-08-20T00:57:35.561Z] Error fetching Douban info (attempt 1/3) for 'American History X': Search result selector not found
+[2025-08-20T00:58:16.098Z] Saved screenshot for 'American History X' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/American History X.png
+[2025-08-20T00:58:16.098Z] Error fetching Douban info (attempt 2/3) for 'American History X': Search result selector not found
+[2025-08-20T00:58:46.698Z] Saved screenshot for 'The Prestige' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/The Prestige.png
+[2025-08-20T00:58:46.698Z] Error fetching Douban info (attempt 1/3) for 'The Prestige': Search result selector not found
+[2025-08-20T00:59:27.324Z] Saved screenshot for 'The Prestige' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/The Prestige.png
+[2025-08-20T00:59:27.324Z] Error fetching Douban info (attempt 2/3) for 'The Prestige': Search result selector not found
+[2025-08-20T00:59:57.879Z] Saved screenshot for 'Harakiri' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Harakiri.png
+[2025-08-20T00:59:57.879Z] Error fetching Douban info (attempt 1/3) for 'Harakiri': Search result selector not found
+[2025-08-20T01:02:01.558Z] Saved screenshot for 'The Departed' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/The Departed.png
+[2025-08-20T01:02:01.558Z] Error fetching Douban info (attempt 1/3) for 'The Departed': Search result selector not found
+[2025-08-20T01:02:42.088Z] Saved screenshot for 'The Departed' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/The Departed.png
+[2025-08-20T01:02:42.089Z] Error fetching Douban info (attempt 2/3) for 'The Departed': Search result selector not found
+[2025-08-20T01:03:13.325Z] Saved screenshot for 'Grave of the Fireflies' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Grave of the Fireflies.png
+[2025-08-20T01:03:13.325Z] Error fetching Douban info (attempt 1/3) for 'Grave of the Fireflies': Search result selector not found
+[2025-08-20T01:03:53.890Z] Saved screenshot for 'Grave of the Fireflies' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Grave of the Fireflies.png
+[2025-08-20T01:03:53.890Z] Error fetching Douban info (attempt 2/3) for 'Grave of the Fireflies': Search result selector not found
+[2025-08-20T01:04:24.591Z] Saved screenshot for 'Witness for the Prosecution' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Witness for the Prosecution.png
+[2025-08-20T01:04:24.591Z] Error fetching Douban info (attempt 1/3) for 'Witness for the Prosecution': Search result selector not found
+[2025-08-20T01:05:05.148Z] Saved screenshot for 'Witness for the Prosecution' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Witness for the Prosecution.png
+[2025-08-20T01:05:05.149Z] Error fetching Douban info (attempt 2/3) for 'Witness for the Prosecution': Search result selector not found
+[2025-08-20T01:05:36.000Z] Saved screenshot for 'Spider-Man: Into the Spider-Verse' at /Users/yilong/Code/Work/movie-data-manager/scripts/screenshots/Spider-Man: Into the Spider-Verse.png
+[2025-08-20T01:05:36.000Z] Error fetching Douban info (attempt 1/3) for 'Spider-Man: Into the Spider-Verse': Search result selector not found
+[2025-08-20T01:05:55.126Z] Error fetching Douban info (attempt 2/3) for 'Spider-Man: Into the Spider-Verse': page.screenshot: Target page, context or browser has been closed

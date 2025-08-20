@@ -190,3 +190,9 @@
     @apply cursor-pointer;
   }
 }
+
+.movie-cards {
+  @media (width >= 1920px) {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+}

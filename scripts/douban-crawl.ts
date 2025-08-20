@@ -175,6 +175,16 @@ async function processMovie(page: Page, movieId: string): Promise<void> {
 
     // 5. Crawl via HTML fallback
     let _title = sanitizedTitle;
+
+    if (
+      /(american pie)|(Irreversible)|(frozen flower)|(Mulholland)|(Midnight Screenings Harry Potter)|(One Flew Over the Cuckoo)|(The Science of Interstellar)|(The Last Jedi Cast Live Q&A)/gim.test(
+        _title,
+      )
+    ) {
+      console.log("跳过", _title);
+      return;
+    }
+
     if (/\(\d{4}\)/.test(sanitizedTitle)) {
       _title = sanitizedTitle.slice(0, -6).trim();
     }
