@@ -75,6 +75,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Pa
             className="my-2 p-2 w-fit mx-auto rounded-lg bg-white/20 backdrop-blur-md"
             totalPages={totalPages}
             currentPage={currentPage}
+            searchParams={_searchParams}
           />
         </div>
       </div>

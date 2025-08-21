@@ -5,19 +5,19 @@ import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
 import { useState } from "react";
 
 export default function Background() {
-  const [idx, setIdx] = useState<number>(68);
+  const [idx, setIdx] = useState<number>(1);
 
   const paginate = (offset: number) => {
     setIdx((prev) => {
       const newIdx = prev + offset;
-      if (newIdx < 1) return 109;
-      if (newIdx > 109) return 1;
+      if (newIdx < 1) return 83;
+      if (newIdx > 83) return 1;
       return newIdx;
     });
   };
   const str = idx.toString().padStart(4, "0");
-  // const filename = `Tenet.2020.2160p.4K.BluRay.x265.10bit.AAC5.1-[YTS.MX]-${str}.jpg`; // 19
-  const filename = `The.Dark.Knight.2008.2160p.4K.BluRay.x265.10bit.AAC5.1-[YTS.MX]-${str}.jpg`; // 68
+  const filename = `Tenet.2020.2160p.4K.BluRay.x265.10bit.AAC5.1-[YTS.MX]-${str}.jpg`; // 19
+  // const filename = `The.Dark.Knight.2008.2160p.4K.BluRay.x265.10bit.AAC5.1-[YTS.MX]-${str}.jpg`; // 68
 
   return (
     <>
