@@ -8,9 +8,11 @@ const MagnetLinks = ({ links, className }: { links: Link[]; className?: string }
   }
 
   return (
-    <div className={cn("space-y-3 backdrop-blur-sm rounded-xl p-3", className)}>
+    <div className={cn("space-y-3 backdrop-blur-sm rounded-xl break-all p-3", className)}>
       {links.map((l) => {
-        const label = `${l.quality.replace(/2160p/gim, "4K")} (${l.source.replace(/BluRay/gim, "BD")}) - ${l.size}`;
+        const label = l.description
+          ? `${l.size} - ${l.description}`
+          : `${l.quality.replace(/2160p/gim, "4K")} (${l.source.replace(/BluRay/gim, "BD")}) - ${l.size}`;
         const href = l.download ?? l.magnet ?? "#";
 
         return (

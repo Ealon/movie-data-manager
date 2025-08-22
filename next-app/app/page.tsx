@@ -10,7 +10,7 @@ type PageSearchParams = {
   keyword?: string;
 };
 
-const PAGE_SIZE = 8;
+const PAGE_SIZE = 24;
 
 const prisma = new PrismaClient();
 

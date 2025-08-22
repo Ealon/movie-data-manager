@@ -9,6 +9,8 @@ import { ExternalLink, EyeIcon, StarIcon } from "lucide-react";
 import doubanLogo from "./douban.svg";
 import { useState, useEffect } from "react";
 import MagnetLinks from "../MagnetLinks";
+import { DeleteMovie } from "../DeleteMovie";
+import { AddLinks } from "../AddLinks";
 
 export default function EditMovie({
   movie,
@@ -56,7 +58,7 @@ export default function EditMovie({
       </DialogTrigger>
       <DialogContent
         showCloseButton={false}
-        className="min-w-2xl bg-black/50 backdrop-blur-xs text-white w-fit max-w-5xl!"
+        className="min-w-2xl bg-black/60 backdrop-blur-sm text-white w-fit max-w-5xl!"
       >
         <DialogHeader>
           <DialogTitle>
@@ -126,7 +128,16 @@ export default function EditMovie({
               <hr className="my-6" />
               <section>
                 <h2 className="text-lg font-bold text-gray-400">Links</h2>
-                <MagnetLinks links={movie.links ?? []} />
+                <div className="max-h-[40vh] overflow-y-auto h-fit">
+                  <MagnetLinks links={movie.links ?? []} />
+                </div>
+                <AddLinks movieId={movie.id} />
+              </section>
+
+              <section className="mt-6 p-5 border-2 border-red-500 border-dashed rounded-lg relative">
+                <h2 className="text-lg font-bold text-rose-500">Danger Zone</h2>
+                <DeleteMovie movieId={movie.id} />
+                <div className="absolute top-0 left-0 w-full h-full bg-rose-500/20 z-50" />
               </section>
             </div>
           </section>

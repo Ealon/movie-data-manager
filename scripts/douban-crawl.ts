@@ -188,7 +188,7 @@ async function processMovie(page: Page, movieId: string): Promise<boolean> {
     let _title = sanitizedTitle;
 
     if (
-      /(american pie)|(Irreversible)|(frozen flower)|(Mulholland)|(Midnight Screenings Harry Potter)|(One Flew Over the Cuckoo)|(The Science of Interstellar)|(The Last Jedi Cast Live Q&A)|(taylor swift)|(Star War)|(your name.)|(a taxi driver)/gim.test(
+      /(american pie)|(Irreversible)|(frozen flower)|(Mulholland)|(Midnight Screenings Harry Potter)|(One Flew Over the Cuckoo)|(The Science of Interstellar)|(The Last Jedi Cast Live Q&A)|(taylor swift)|(Star War)|(your name.)|(a taxi driver)|(Fabulous Destiny)|(angel guts)|()/gim.test(
         _title,
       )
     ) {

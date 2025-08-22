@@ -79,7 +79,9 @@ export default function MovieCard({ movie }: { movie: MovieCardProps }) {
       <MovieCover movie={movie} />
       <div className="absolute bottom-0 left-0 w-full h-fit pt-6 bg-gradient-to-t from-black/80 from-15% via-black/50 via-80% to-transparent">
         <MovieInfo movie={movie} />
-        <MagnetLinks className="hidden group-hover:block text-sm space-y-1.5" links={movie.links ?? []} />
+        <div className="max-h-full overflow-auto h-fit">
+          <MagnetLinks className="hidden group-hover:block text-sm space-y-1.5" links={movie.links ?? []} />
+        </div>
         {process.env.NODE_ENV === "development" && (
           <div className="w-fit mx-auto hidden group-hover:block">
             <EditMovie movie={movie} doubanInfoUpdater={<DoubanInfoUpdater movieId={movie.id} />} />
