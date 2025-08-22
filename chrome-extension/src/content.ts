@@ -93,9 +93,9 @@ function main(): void {
   win.__movieDataManagerRan = true;
 
   /**
-   * Extracts movie data from the modal table according to requirements.
+   * Extracts movie data and magnet links from RARBG movie page.
    */
-  async function extractMovieDataFromTable(table: Element): Promise<ExtractedData> {
+  async function extractRarbgMovieData(table: Element): Promise<ExtractedData> {
     const rows = table.querySelectorAll("tbody tr");
     const links: LinkInfo[] = [];
     const _title = document.querySelector("h1")?.textContent?.trim() || "";
@@ -235,26 +235,95 @@ function main(): void {
     }
   }
 
-  async function run(): Promise<void> {
+  interface YinfansMovieData {
+    link: string; // magnet link
+    quality: string; // "4K", "1080P", etc.
+    size: string; // "11.51GB", "在线观看", etc.
+    title: string; // movie title
+  }
+
+  async function extractYinfansMovieData(): Promise<void> {
     try {
-      // If on Douban movie detail page, extract ld+json and print, then exit
+      // 1. Find "table#cili"
+      const table = document.querySelector("table#cili");
+      if (!table) {
+        logger("Error: table#cili not found");
+        return;
+      }
+
+      // 2. Traverse each row and extract data
+      const rows = table.querySelectorAll("tbody tr");
+      if (rows.length === 0) {
+        logger("Error: No rows found in table#cili");
+        return;
+      }
+
+      const movieData: YinfansMovieData[] = [];
+
+      rows.forEach((row, index) => {
+        const linkElement = row.querySelector("a[href]");
+        if (!linkElement) return;
+
+        const href = linkElement.getAttribute("href");
+        if (!href) return;
+
+        // Extract quality and size from the span elements
+        const qualityElement = row.querySelector("span.label.label-danger");
+        const sizeElement = row.querySelector("span.label.label-warning");
+
+        const quality = qualityElement ? qualityElement.textContent?.trim() || "" : "";
+        const size = sizeElement ? sizeElement.textContent?.trim() || "" : "";
+
+        // Extract title from the bold text
+        const titleElement = linkElement.querySelector("b");
+        const title = titleElement ? titleElement.textContent?.trim() || "" : "";
+
+        if (href && title) {
+          movieData.push({
+            link: href,
+            quality,
+            size,
+            title,
+          });
+        }
+      });
+
+      // Log the extracted data
+      logger("Extracted Yinfans movie data:", "\n", movieData, "\n\n");
+      logger(`Total entries found: ${movieData.length}`);
+    } catch (error) {
+      logger("Error extracting Yinfans movie data:", error);
+    }
+  }
+
+  async function _run(): Promise<void> {
+    try {
+      // * 豆瓣电影
       const isDoubanMoviePage = location.hostname === "movie.douban.com" && location.pathname.startsWith("/subject/");
       if (isDoubanMoviePage) {
         await extractDoubanMovieData();
         return;
       }
 
-      // 1-2. Find and click the button programmatically
-      const button = await waitForElement("a.torrent-modal-download", document, 8000);
-      if (button) {
-        try {
-          (button as HTMLElement).click();
-        } catch {
-          try {
-            button.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
-          } catch {}
-        }
+      // * 音范丝 https://www.yinfans.me/movie/40111
+      const isYinfansMoviePage = /yinfans/gim.test(location.hostname) && location.pathname.startsWith("/movie/");
+      if (isYinfansMoviePage) {
+        await extractYinfansMovieData();
+        return;
       }
+
+      // * RARBG
+      // 1-2. Find and click the button programmatically
+      // const button = await waitForElement("a.torrent-modal-download", document, 8000);
+      // if (button) {
+      //   try {
+      //     (button as HTMLElement).click();
+      //   } catch {
+      //     try {
+      //       button.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
+      //     } catch {}
+      //   }
+      // }
 
       // 3. Find the table inside the modal
       const table = await waitForElement(".modal-download .modal-content table", document, 12000);
@@ -264,7 +333,7 @@ function main(): void {
       }
 
       // 4-7. Extract, filter, and format data
-      const data = await extractMovieDataFromTable(table);
+      const data = await extractRarbgMovieData(table);
 
       // 8. Print out the json data into the console
       try {
@@ -291,9 +360,9 @@ function main(): void {
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", run, { once: true });
+    document.addEventListener("DOMContentLoaded", _run, { once: true });
   } else {
-    run();
+    _run();
   }
 }
 

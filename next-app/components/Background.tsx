@@ -20,8 +20,6 @@ function generateShuffledArray(length: number) {
 
 const shuffledArray = generateShuffledArray(NUMBER_OF_BG);
 
-console.log(shuffledArray);
-
 export default function Background() {
   const [idx, setIdx] = useState<number>(0);
 
@@ -32,11 +30,10 @@ export default function Background() {
         if (newIdx > NUMBER_OF_BG - 1) return 0;
         return newIdx;
       });
-    }, 1_500);
+    }, 15_000);
     return () => clearInterval(intervalId);
   }, []);
 
-  console.log(idx, shuffledArray[idx]);
   return (
     <>
       <img

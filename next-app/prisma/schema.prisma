@@ -29,14 +29,16 @@ model Movie {
 }
 
 model Link {
-  id       String @id @unique @default(uuid())
-  movie    Movie  @relation(fields: [movieId], references: [id])
-  movieId  String
-  quality  String
-  size     String
-  source   String
-  magnet   String @unique
-  download String @unique
+  id          String  @id @unique @default(uuid())
+  movie       Movie   @relation(fields: [movieId], references: [id])
+  movieId     String
+  quality     String
+  size        String
+  source      String
+  hidden      Boolean @default(false)
+  description String?
+  magnet      String  @unique
+  download    String  @unique
 }
 
 model DoubanInfo {

@@ -1,12 +1,20 @@
 import path from "node:path";
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
-import { setTimeout as delay } from "node:timers/promises";
 import dotenv from "dotenv";
 import { type Browser, chromium, Page, type Cookie } from "playwright";
 
 // Reuse Prisma client generated in next-app/generated/prisma
 import { PrismaClient } from "../next-app/generated/prisma";
+
+const USER_AGENTS = [
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36",
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36",
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15",
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Safari/605.1.15",
+];
 
 // Load env from next-app/.env
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -43,7 +51,7 @@ function buildDoubanSearchUrl(movieUrl: string): string {
   return searchUrl;
 }
 
-async function waitForSelectorWithRetries(page: Page, selector: string, timeoutMs = 30000): Promise<boolean> {
+async function waitForSelectorWithRetries(page: Page, selector: string, timeoutMs = 30_000): Promise<boolean> {
   try {
     await page.waitForSelector(selector, { timeout: timeoutMs, state: "visible" });
     return true;
@@ -87,7 +95,7 @@ async function fetchDoubanInfoWithRetries(
   movie: { title: string; url: string; year: number | null },
 ): Promise<DoubanHtmlInfo | null> {
   const searchUrl = buildDoubanSearchUrl(movie.url);
-  const maxAttempts = 2;
+  const maxAttempts = 1;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
       await page.goto(searchUrl, { waitUntil: "domcontentloaded", timeout: 60_000 });
@@ -111,10 +119,12 @@ async function fetchDoubanInfoWithRetries(
       return info;
     } catch (err: any) {
       appendLog(
-        `Error fetching Douban info (attempt ${attempt}/3) for '${movie.title}': ${err?.message || String(err)}`,
+        `Error fetching Douban info (attempt ${attempt}/${maxAttempts}) for '${movie.title}': ${
+          err?.message || String(err)
+        }`,
       );
       if (attempt < maxAttempts) {
-        await delay(10_000 * attempt);
+        await new Promise((resolve) => setTimeout(resolve, 10_000 * attempt));
         continue;
       }
       return null;
@@ -123,13 +133,14 @@ async function fetchDoubanInfoWithRetries(
   return null;
 }
 
-async function processMovie(page: Page, movieId: string): Promise<void> {
+// ? use return value to indicate whether to dalay
+async function processMovie(page: Page, movieId: string): Promise<boolean> {
   try {
     const movie = await prisma.movie.findUnique({
       where: { id: movieId },
       include: { doubanInfo: true },
     });
-    if (!movie) return;
+    if (!movie) return false;
 
     // 1-2. Sanitize/normalize and update before crawling
     const sanitizedTitle = sanitizeName(movie.title);
@@ -169,7 +180,7 @@ async function processMovie(page: Page, movieId: string): Promise<void> {
       console.log("豆瓣信息已存在:", movie.doubanInfo.title, movie.doubanInfo.rating);
       if (ONLY_UPDATE_IF_EMPTY) {
         console.log("跳过更新... (ONLY_UPDATE_IF_EMPTY)\n");
-        return;
+        return false;
       }
     }
 
@@ -177,12 +188,12 @@ async function processMovie(page: Page, movieId: string): Promise<void> {
     let _title = sanitizedTitle;
 
     if (
-      /(american pie)|(Irreversible)|(frozen flower)|(Mulholland)|(Midnight Screenings Harry Potter)|(One Flew Over the Cuckoo)|(The Science of Interstellar)|(The Last Jedi Cast Live Q&A)/gim.test(
+      /(american pie)|(Irreversible)|(frozen flower)|(Mulholland)|(Midnight Screenings Harry Potter)|(One Flew Over the Cuckoo)|(The Science of Interstellar)|(The Last Jedi Cast Live Q&A)|(taylor swift)|(Star War)|(your name.)|(a taxi driver)/gim.test(
         _title,
       )
     ) {
       console.log("跳过", _title);
-      return;
+      return false;
     }
 
     if (/\(\d{4}\)/.test(sanitizedTitle)) {
@@ -194,20 +205,23 @@ async function processMovie(page: Page, movieId: string): Promise<void> {
       url: movie.url,
       year: derivedYear || null,
     });
-    if (!info) return;
+    if (!info) return true;
+
+    console.log("\ndouban info:", _title, info);
+    appendLog(`Douban info for '${_title}': ${JSON.stringify(info)}`);
 
     // 6. Cross-check year
     const extractedYear = parseInt(info.datePublished, 10) || 0;
     const dbYear = derivedYear || 0;
     if (dbYear && extractedYear && dbYear !== extractedYear) {
       appendLog(`Year mismatch for '${_title}': db=${dbYear}, douban=${extractedYear}`);
-      return;
+      return true;
     }
 
     // 7. Cross-check title appearance
     if (!titleAppearsInExtracted(_title, info)) {
       appendLog(`Title mismatch for '${_title}': not found in douban title/details`);
-      return;
+      return true;
     }
 
     // 8. Upsert doubanInfo
@@ -238,14 +252,11 @@ async function processMovie(page: Page, movieId: string): Promise<void> {
       }
     } catch (err: any) {
       appendLog(`Failed to upsert doubanInfo for '${_title}': ${err?.message || String(err)}`);
-      return;
+      return true;
     }
-
-    // Throttle: randomized 30-40s
-    const sleepMs = 30_000 + Math.floor(Math.random() * 10_000);
-    await delay(sleepMs);
   } catch (err: any) {
     appendLog(`Unexpected error processing movieId=${movieId}: ${err?.message || String(err)}`);
+    return true;
   }
 }
 
@@ -259,12 +270,11 @@ async function main(): Promise<void> {
   try {
     browser = await chromium.launch({ headless: true });
 
-    const USER_AGENT = process.env.DOUBAN_USER_AGENT || undefined;
     const COOKIE_JSON = process.env.DOUBAN_COOKIES_JSON || "";
     const COOKIE_HEADER = process.env.DOUBAN_COOKIE_HEADER || "";
 
     const context = await browser.newContext({
-      userAgent: USER_AGENT,
+      userAgent: USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)],
       viewport: { width: 1920, height: 1080 },
       locale: "zh-CN",
       timezoneId: "Asia/Shanghai",
@@ -292,15 +302,25 @@ async function main(): Promise<void> {
       }
     }
 
-    if (USER_AGENT) appendLog(`Using custom user-agent from DOUBAN_USER_AGENT.`);
     if (COOKIE_HEADER && !COOKIE_JSON) appendLog(`Using raw cookie header from DOUBAN_COOKIE_HEADER.`);
 
     const page = await context.newPage();
 
     // Process all movies
-    const movies = await prisma.movie.findMany({ select: { id: true }, orderBy: { createdAt: "asc" } });
+    const movies = await prisma.movie.findMany({
+      select: { id: true },
+      orderBy: { createdAt: "asc" },
+      where: { doubanInfo: { is: null } },
+    });
     for (const m of movies) {
-      await processMovie(page, m.id);
+      const shouldDelay = await processMovie(page, m.id);
+
+      if (!shouldDelay) continue;
+
+      // Throttle: randomized 45-60s between each movie
+      const sleepMs = 45_000 + Math.floor(Math.random() * 15_000);
+      console.log(`Waiting ${sleepMs / 1000}s before next movie...`);
+      await new Promise((resolve) => setTimeout(resolve, sleepMs));
     }
 
     await browser.close();
@@ -310,6 +330,7 @@ async function main(): Promise<void> {
     try {
       await prisma.$disconnect();
     } catch {}
+
     if (browser) {
       await browser.close();
     }

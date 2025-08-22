@@ -1,9 +1,12 @@
-import { MagnetIcon, StarIcon } from "lucide-react";
+import { EyeIcon, StarIcon } from "lucide-react";
 import { DoubanInfoUpdater } from "@/components/DoubanInfoUpdater";
-import { cn } from "@/lib/utils";
 import type { DoubanInfo, Movie, Link as PrismaLink } from "@/generated/prisma";
+import { Button } from "./ui/button";
+import Link from "next/link";
+import EditMovie from "./EditMovie";
+import MagnetLinks from "./MagnetLinks";
 
-type MovieCardProps = Movie & { links?: PrismaLink[]; doubanInfo: DoubanInfo | null };
+export type MovieCardProps = Movie & { links?: PrismaLink[]; doubanInfo: DoubanInfo | null };
 
 const MovieCover = ({ movie }: { movie: Movie }) => {
   const coverImage = /thumbnail/gim.test(movie.coverImage ?? "") ? "/300x450.svg" : movie.coverImage;
@@ -15,7 +18,7 @@ const MovieCover = ({ movie }: { movie: Movie }) => {
         src={coverImage || "/300x450.svg"}
         alt={movie.coverAlt ?? movie.title}
         title={movie.coverTitle ?? movie.title}
-        className="w-full object-contain aspect-[2/3] bg-[url('/300x450.svg')]"
+        className="w-full object-cover aspect-[2/3] bg-[url('/300x450.svg')]"
       />
     );
   }
@@ -27,7 +30,6 @@ const MovieCover = ({ movie }: { movie: Movie }) => {
 };
 
 const MovieInfo = ({ movie }: { movie: MovieCardProps }) => {
-  console.log("豆瓣URL", movie?.doubanInfo?.url);
   return (
     <article className="text-center flex flex-col gap-1.5 justify-center items-center group-hover:hidden p-3">
       <h2 className="text-white text-lg font-bold text-shadow-xs text-shadow-black/35">
@@ -43,37 +45,6 @@ const MovieInfo = ({ movie }: { movie: MovieCardProps }) => {
         )}
       </p>
     </article>
-  );
-};
-
-const MagnetLinks = ({ movie }: { movie: MovieCardProps }) => {
-  return (
-    <div className="flex-col gap-1.5 text-sm hidden backdrop-blur-sm rounded-xl group-hover:flex p-3">
-      {movie.links &&
-        movie.links.length > 0 &&
-        movie.links.map((l) => {
-          const label = `${l.quality.replace(/2160p/gim, "4K")} (${l.source.replace(/BluRay/gim, "BD")}) - ${l.size}`;
-          const href = l.download ?? l.magnet ?? "#";
-
-          return (
-            <a
-              key={l.id}
-              href={href}
-              className={cn(
-                "flex items-center gap-1 underline font-medium underline-offset-1 hover:text-blue-400 mx-auto w-fit",
-                /(1080p)|(2160p)/gim.test(l.quality) && /blu/gim.test(l.source)
-                  ? "text-amber-500 hover:text-yellow-400"
-                  : "text-indigo-500 hover:text-blue-400",
-              )}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <MagnetIcon className="size-4" />
-              <span>{label}</span>
-            </a>
-          );
-        })}
-    </div>
   );
 };
 
@@ -103,27 +74,15 @@ const Links = ({ movie }: { movie: MovieCardProps }) => {
 };
 
 export default function MovieCard({ movie }: { movie: MovieCardProps }) {
-  const searchWord = movie.url.split("/").pop()?.replaceAll("-", "+").replaceAll("+idvc100", "");
-  const searchDoubanHref = `https://search.douban.com/movie/subject_search?search_text=${searchWord}`;
-
   return (
     <div key={movie.id} className="rounded-lg overflow-hidden group relative">
       <MovieCover movie={movie} />
       <div className="absolute bottom-0 left-0 w-full h-fit pt-6 bg-gradient-to-t from-black/80 from-15% via-black/50 via-80% to-transparent">
         <MovieInfo movie={movie} />
-        <MagnetLinks movie={movie} />
-
-        {false && (
-          <div className=" items-center gap-2 hidden group-hover:flex">
-            <a
-              href={searchDoubanHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs font-black bg-green-600 text-white px-2 py-1 rounded-sm block"
-            >
-              在豆瓣搜索
-            </a>
-            <DoubanInfoUpdater movieId={movie.id} />
+        <MagnetLinks className="hidden group-hover:block text-sm space-y-1.5" links={movie.links ?? []} />
+        {process.env.NODE_ENV === "development" && (
+          <div className="w-fit mx-auto hidden group-hover:block">
+            <EditMovie movie={movie} doubanInfoUpdater={<DoubanInfoUpdater movieId={movie.id} />} />
           </div>
         )}
       </div>

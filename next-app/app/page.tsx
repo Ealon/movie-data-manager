@@ -10,6 +10,8 @@ type PageSearchParams = {
   keyword?: string;
 };
 
+const PAGE_SIZE = 8;
+
 const prisma = new PrismaClient();
 
 function parsePositiveInt(value: string | undefined, fallback: number): number {
@@ -20,7 +22,7 @@ function parsePositiveInt(value: string | undefined, fallback: number): number {
 export default async function Home({ searchParams }: { searchParams?: Promise<PageSearchParams> }) {
   const _searchParams = await searchParams;
   const currentPage = parsePositiveInt(_searchParams?.page, 1);
-  const pageSize = parsePositiveInt(_searchParams?.pageSize, 8);
+  const pageSize = parsePositiveInt(_searchParams?.pageSize, PAGE_SIZE);
   const skip = (currentPage - 1) * pageSize;
   const keyword = _searchParams?.keyword;
 
