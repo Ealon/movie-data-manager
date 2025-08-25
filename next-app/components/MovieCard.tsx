@@ -1,8 +1,6 @@
-import { EyeIcon, StarIcon } from "lucide-react";
+import { StarIcon } from "lucide-react";
 import { DoubanInfoUpdater } from "@/components/DoubanInfoUpdater";
 import type { DoubanInfo, Movie, Link as PrismaLink } from "@/generated/prisma";
-import { Button } from "./ui/button";
-import Link from "next/link";
 import EditMovie from "./EditMovie";
 import MagnetLinks from "./MagnetLinks";
 
@@ -75,7 +73,7 @@ const Links = ({ movie }: { movie: MovieCardProps }) => {
 
 export default function MovieCard({ movie }: { movie: MovieCardProps }) {
   return (
-    <div key={movie.id} className="rounded-lg overflow-hidden group relative">
+    <div key={movie.id} className="rounded-lg overflow-hidden border-2 border-white/10 group relative">
       <MovieCover movie={movie} />
       <div className="absolute bottom-0 left-0 w-full h-fit pt-6 bg-gradient-to-t from-black/80 from-15% via-black/50 via-80% to-transparent">
         <MovieInfo movie={movie} />
