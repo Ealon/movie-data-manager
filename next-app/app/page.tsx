@@ -10,7 +10,7 @@ type PageSearchParams = {
   keyword?: string;
 };
 
-const PAGE_SIZE = 24;
+const PAGE_SIZE = 16;
 
 const prisma = new PrismaClient();
 
@@ -41,8 +41,8 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Pa
     }),
     prisma.movie.findMany({
       where,
-      // orderBy: { doubanInfo: { rating: "desc" } },
-      orderBy: { updatedAt: "desc" },
+      orderBy: { doubanInfo: { rating: "desc" } },
+      // orderBy: { updatedAt: "desc" },
       include: { links: { orderBy: { quality: "desc" } }, doubanInfo: true },
       skip,
       take: pageSize,

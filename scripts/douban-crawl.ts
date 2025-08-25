@@ -105,7 +105,8 @@ async function fetchDoubanInfoWithRetries(
         const screenshotPath = path.resolve(__dirname, `./screenshots/${movie.title}.png`);
         await page.screenshot({ path: screenshotPath, fullPage: true });
         appendLog(`Saved screenshot for '${movie.title}' at ${screenshotPath}`);
-        throw new Error("Search result selector not found");
+        console.log("\n\n!!! ------ 可能被判别为机器人 ------ !!!\n\n");
+        throw new Error("Search result selector not found（可能被判别为机器人）");
       }
 
       const firstHref = await page.locator("div#root div.item-root a").first().getAttribute("href");
@@ -188,11 +189,11 @@ async function processMovie(page: Page, movieId: string): Promise<boolean> {
     let _title = sanitizedTitle;
 
     if (
-      /(american pie)|(Irreversible)|(frozen flower)|(Mulholland)|(Midnight Screenings Harry Potter)|(One Flew Over the Cuckoo)|(The Science of Interstellar)|(The Last Jedi Cast Live Q&A)|(taylor swift)|(Star War)|(your name.)|(a taxi driver)|(Fabulous Destiny)|(angel guts)|()/gim.test(
+      /(american pie)|(Irreversible)|(frozen flower)|(Mulholland)|(Midnight Screenings Harry Potter)|(One Flew Over the Cuckoo)|(The Science of Interstellar)|(The Last Jedi Cast Live Q&A)|(taylor swift)|(your name.)|(a taxi driver)|(Fabulous Destiny)|(angel guts)|(attack on titan)|(Little Forest: Summer)|(Vendetta)|(Creation of the Gods)|(Bicycle Thieves)|(Diamond Hands)|(rape me)|(in the Realm of the Senses)|(Caligula)|(Bicycle Thieves)/gim.test(
         _title,
       )
     ) {
-      console.log("跳过", _title);
+      console.log("手动跳过", _title);
       return false;
     }
 
@@ -207,20 +208,21 @@ async function processMovie(page: Page, movieId: string): Promise<boolean> {
     });
     if (!info) return true;
 
-    console.log("\ndouban info:", _title, info);
-    appendLog(`Douban info for '${_title}': ${JSON.stringify(info)}`);
+    console.log("\ndouban info:", _title, info.title, info.datePublished, info.rating);
 
     // 6. Cross-check year
     const extractedYear = parseInt(info.datePublished, 10) || 0;
     const dbYear = derivedYear || 0;
     if (dbYear && extractedYear && dbYear !== extractedYear) {
       appendLog(`Year mismatch for '${_title}': db=${dbYear}, douban=${extractedYear}`);
+      appendLog(`Douban info for '${_title}': ${JSON.stringify(info)}`);
       return true;
     }
 
     // 7. Cross-check title appearance
     if (!titleAppearsInExtracted(_title, info)) {
       appendLog(`Title mismatch for '${_title}': not found in douban title/details`);
+      appendLog(`Douban info for '${_title}': ${JSON.stringify(info)}`);
       return true;
     }
 
@@ -250,6 +252,7 @@ async function processMovie(page: Page, movieId: string): Promise<boolean> {
           },
         });
       }
+      return true;
     } catch (err: any) {
       appendLog(`Failed to upsert doubanInfo for '${_title}': ${err?.message || String(err)}`);
       return true;
@@ -270,7 +273,9 @@ async function main(): Promise<void> {
   try {
     browser = await chromium.launch({ headless: true });
 
-    const COOKIE_JSON = process.env.DOUBAN_COOKIES_JSON || "";
+    const COOKIE_JSON =
+      '[{"name":"lng","value":"en","domain":".douban.com","path":"/"},{"name":"__stripe_mid","value":"3c8de529-3816-41cc-aec0-2556bce0d83f5ae4ed","domain":".douban.com","path":"/"},{"name":"__next_hmr_refresh_hash__","value":"19","domain":".douban.com","path":"/"}]';
+
     const COOKIE_HEADER = process.env.DOUBAN_COOKIE_HEADER || "";
 
     const context = await browser.newContext({
@@ -308,17 +313,22 @@ async function main(): Promise<void> {
 
     // Process all movies
     const movies = await prisma.movie.findMany({
+      where: { doubanInfo: { is: null } },
       select: { id: true },
       orderBy: { createdAt: "asc" },
-      where: { doubanInfo: { is: null } },
+      // skip: 90,
+      // take: 300,
     });
+
+    console.log(`${movies.length} movies to process.\n\n`);
+
     for (const m of movies) {
       const shouldDelay = await processMovie(page, m.id);
 
       if (!shouldDelay) continue;
 
-      // Throttle: randomized 45-60s between each movie
-      const sleepMs = 45_000 + Math.floor(Math.random() * 15_000);
+      // Throttle: randomized 15-20s between each movie
+      const sleepMs = 15_000 + Math.floor(Math.random() * 5_000);
       console.log(`Waiting ${sleepMs / 1000}s before next movie...`);
       await new Promise((resolve) => setTimeout(resolve, sleepMs));
     }
