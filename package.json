@@ -1,4 +1,14 @@
 {
+  "name": "movie-app",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "yarn@1.22.22",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "check-types": "turbo check-types"
+  },
   "devDependencies": {
     "turbo": "^2.5.6"
   }

@@ -22,6 +22,8 @@
     {
       "matches": [
         "https://en.rarbg-official.com/movies/*",
+        "https://en.rarbg-official.com/seasons/*",
+        "https://en.rarbg-official.com/episodes/*",
         "https://movie.douban.com/subject/*",
         "https://www.yinfans.me/movie/*",
         "https://www.yinfans.net/movie/*"

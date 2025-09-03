@@ -98,8 +98,14 @@ function main(): void {
   async function extractRarbgMovieData(table: Element): Promise<ExtractedData> {
     const rows = table.querySelectorAll("tbody tr");
     const links: LinkInfo[] = [];
-    const _title = document.querySelector("h1")?.textContent?.trim() || "";
-    const _year = document.querySelector("h2")?.textContent?.trim() || "";
+    const _title =
+      document.querySelector("#movie-info h1")?.textContent?.trim() ||
+      document.querySelector("#mobile-movie-info h1")?.textContent?.trim() ||
+      "";
+    const _year =
+      document.querySelector("#movie-info h2")?.textContent?.trim() ||
+      document.querySelector("#mobile-movie-info h2")?.textContent?.trim() ||
+      "";
 
     rows.forEach((row) => {
       const cells = row.querySelectorAll<HTMLTableCellElement>("td");
@@ -338,7 +344,7 @@ function main(): void {
       // 8. Print out the json data into the console
       try {
         logger("Extracted data:", JSON.stringify(data, null, 2));
-        const response = await fetch("http://localhost:8120/api/movie", {
+        const response = await fetch("https://ealon-movie.vercel.app/api/movie", {
           method: "POST",
           body: JSON.stringify(data),
           headers: {

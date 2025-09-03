@@ -7,6 +7,9 @@ import { type Browser, chromium, Page, type Cookie } from "playwright";
 // Reuse Prisma client generated in next-app/generated/prisma
 import { PrismaClient } from "../next-app/generated/prisma";
 
+const COOKIE_JSON =
+  '[{"name":"bid","value":"xLdbC1Dm6PE","domain":".douban.com","path":"/"},{"name":"ll","value":"\\"108165\\"","domain":".douban.com","path":"/"},{"name":"douban-fav-remind","value":"1","domain":".douban.com","path":"/"},{"name":"push_noty_num","value":"0","domain":".douban.com","path":"/"},{"name":"push_doumail_num","value":"0","domain":".douban.com","path":"/"},{"name":"ct","value":"y","domain":".douban.com","path":"/"},{"name":"ck","value":"D58H","domain":".douban.com","path":"/"},{"name":"ap_v","value":"0,6.0","domain":".douban.com","path":"/"}]';
+
 const USER_AGENTS = [
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36",
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
@@ -188,11 +191,7 @@ async function processMovie(page: Page, movieId: string): Promise<boolean> {
     // 5. Crawl via HTML fallback
     let _title = sanitizedTitle;
 
-    if (
-      /(american pie)|(Irreversible)|(frozen flower)|(Mulholland)|(Midnight Screenings Harry Potter)|(One Flew Over the Cuckoo)|(The Science of Interstellar)|(The Last Jedi Cast Live Q&A)|(taylor swift)|(your name.)|(a taxi driver)|(Fabulous Destiny)|(angel guts)|(attack on titan)|(Little Forest: Summer)|(Vendetta)|(Creation of the Gods)|(Bicycle Thieves)|(Diamond Hands)|(rape me)|(in the Realm of the Senses)|(Caligula)|(Bicycle Thieves)/gim.test(
-        _title,
-      )
-    ) {
+    if (/(episode)|(Anatomy of Hell)|(Emperor Caligula)|(Star Wars:)|(Continental Drift)/gim.test(_title)) {
       console.log("手动跳过", _title);
       return false;
     }
@@ -273,11 +272,6 @@ async function main(): Promise<void> {
   try {
     browser = await chromium.launch({ headless: true });
 
-    const COOKIE_JSON =
-      '[{"name":"lng","value":"en","domain":".douban.com","path":"/"},{"name":"__stripe_mid","value":"3c8de529-3816-41cc-aec0-2556bce0d83f5ae4ed","domain":".douban.com","path":"/"},{"name":"__next_hmr_refresh_hash__","value":"19","domain":".douban.com","path":"/"}]';
-
-    const COOKIE_HEADER = process.env.DOUBAN_COOKIE_HEADER || "";
-
     const context = await browser.newContext({
       userAgent: USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)],
       viewport: { width: 1920, height: 1080 },
@@ -306,8 +300,6 @@ async function main(): Promise<void> {
         appendLog(`Failed parsing DOUBAN_COOKIES_JSON: ${e?.message || String(e)}`);
       }
     }
-
-    if (COOKIE_HEADER && !COOKIE_JSON) appendLog(`Using raw cookie header from DOUBAN_COOKIE_HEADER.`);
 
     const page = await context.newPage();
 

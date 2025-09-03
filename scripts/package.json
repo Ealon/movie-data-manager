@@ -6,6 +6,8 @@
   "scripts": {
     "start": "tsx douban-crawl.ts",
     "dev": "tsx watch douban-crawl.ts",
+    "sync:pull": "tsx sync-db.ts pull prod",
+    "sync:push": "tsx sync-db.ts push prod",
     "postinstall": "playwright install chromium"
   },
   "dependencies": {

@@ -21,7 +21,7 @@ const MovieCover = ({ movie }: { movie: Movie }) => {
     );
   }
   return (
-    <div className="w-full flex items-center justify-center" style={{ aspectRatio: "2 / 3" }}>
+    <div className="w-full flex items-center justify-center aspect-[2/3]">
       <div className="size-[64px] rounded bg-gray-300 dark:bg-gray-700" />
     </div>
   );
@@ -71,7 +71,7 @@ const Links = ({ movie }: { movie: MovieCardProps }) => {
   );
 };
 
-export default function MovieCard({ movie }: { movie: MovieCardProps }) {
+export default async function MovieCard({ movie }: { movie: MovieCardProps }) {
   return (
     <div key={movie.id} className="rounded-lg overflow-hidden border-2 border-white/10 group relative">
       <MovieCover movie={movie} />

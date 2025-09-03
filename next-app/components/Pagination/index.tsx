@@ -109,10 +109,10 @@ const Pagination = ({
 
   return (
     <PaginationComponent className={className} {...props}>
+      <span data-slot="pagination-item">
+        <PaginationPrevious href={prevPageHref} />
+      </span>
       <PaginationContent>
-        <PaginationItem>
-          <PaginationPrevious href={prevPageHref} />
-        </PaginationItem>
         {paginationRange.map((item) => {
           if (item === "..." || item === "..") {
             return <PaginationEllipsis className="text-white" key={item} />;
@@ -128,10 +128,10 @@ const Pagination = ({
             </PaginationItem>
           );
         })}
-        <PaginationItem>
-          <PaginationNext href={nextPageHref} />
-        </PaginationItem>
       </PaginationContent>
+      <span data-slot="pagination-item">
+        <PaginationNext href={nextPageHref} />
+      </span>
     </PaginationComponent>
   );
 };
