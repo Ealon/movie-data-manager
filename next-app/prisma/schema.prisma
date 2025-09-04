@@ -25,6 +25,7 @@ model Movie {
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
   links      Link[]
+  hidden     Boolean     @default(false)
   doubanInfo DoubanInfo?
 }
 

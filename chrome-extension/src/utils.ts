@@ -56,8 +56,8 @@ export function waitForElement(
 
 export function logger(message: string, ...args: any[]): void {
   console.log(
-    `%c[Movie Data Manager]: ${message}`,
-    "background: #fb1; color: #4527a0; padding: 2px 6px; border-radius: 2px; font-weight: 600; font-size:13px;",
+    `%c[- M -]: ${message}`,
+    "background: #F92; background: linear-gradient(120deg,#f92 18%, #fb1 100%); color: #4527a0; padding: 3px 6px; border-radius: 2px; font-weight: 600; font-size:13px;",
     "\n",
     ...args,
   );

@@ -1,7 +1,5 @@
 // Popup script for Movie Data Manager extension
 
-import { LOCAL_SERVER_BASE_URL, PROD_SERVER_BASE_URL } from "./config";
-
 // Chrome extension types
 declare const chrome: {
   storage: {
@@ -31,13 +29,13 @@ declare namespace chrome {
 
 interface PopupManager {
   currentTab: chrome.tabs.Tab | null;
-  serverUrl: string;
+  whichServer: "local" | "prod";
   currentPageType: string;
 }
 
 class PopupManager {
   public currentTab: chrome.tabs.Tab | null = null;
-  public serverUrl: string = PROD_SERVER_BASE_URL; // Default to production
+  public whichServer: "local" | "prod" = "prod";
   public currentPageType: string = "unknown";
 
   constructor() {
@@ -55,7 +53,7 @@ class PopupManager {
     try {
       const result = await chrome.storage.sync.get(["serverSelection"]);
       if (result.serverSelection) {
-        this.serverUrl = result.serverSelection === "local" ? LOCAL_SERVER_BASE_URL : PROD_SERVER_BASE_URL;
+        this.whichServer = result.serverSelection;
 
         // Update radio button selection
         const radio = document.getElementById(result.serverSelection) as HTMLInputElement;
@@ -66,10 +64,10 @@ class PopupManager {
     }
   }
 
-  async saveServerSelection(selection: string): Promise<void> {
+  async saveServerSelection(selection: "local" | "prod"): Promise<void> {
     try {
       await chrome.storage.sync.set({ serverSelection: selection });
-      this.serverUrl = selection === "local" ? LOCAL_SERVER_BASE_URL : PROD_SERVER_BASE_URL;
+      this.whichServer = selection;
       this.updateCurrentServerUrl();
     } catch (error) {
       console.error("Failed to save server selection:", error);
@@ -78,7 +76,10 @@ class PopupManager {
 
   async detectCurrentPage(): Promise<void> {
     try {
-      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      const [tab] = await chrome.tabs.query({
+        active: true,
+        currentWindow: true,
+      });
       this.currentTab = tab;
       console.log("Current tab:", tab);
 
@@ -114,7 +115,7 @@ class PopupManager {
       radio.addEventListener("change", (e) => {
         const target = e.target as HTMLInputElement;
         if (target) {
-          this.saveServerSelection(target.value);
+          this.saveServerSelection(target.value as "local" | "prod");
         }
       });
     });
@@ -145,7 +146,7 @@ class PopupManager {
   updateCurrentServerUrl(): void {
     const urlElement = document.getElementById("currentServerUrl");
     if (urlElement) {
-      urlElement.textContent = `Current server: ${this.serverUrl}`;
+      urlElement.textContent = `Current server: ${this.whichServer}`;
     }
   }
 
@@ -183,7 +184,7 @@ class PopupManager {
       console.log("Page status updated:", {
         currentPageType: this.currentPageType,
         currentTab: this.currentTab,
-        serverUrl: this.serverUrl,
+        whichServer: this.whichServer,
       });
     }
   }
@@ -239,7 +240,7 @@ class PopupManager {
       const response = await chrome.tabs.sendMessage(this.currentTab.id, {
         action: "extractAndSubmitDouban",
         url,
-        serverUrl: this.serverUrl,
+        whichServer: this.whichServer,
       });
 
       console.log("\nresponse", response);
@@ -314,7 +315,7 @@ class PopupManager {
       const response = await chrome.tabs.sendMessage(this.currentTab.id, {
         action: "extractAndSubmitYinfans",
         url: url,
-        serverUrl: this.serverUrl,
+        whichServer: this.whichServer,
       });
 
       if (response.success) {
