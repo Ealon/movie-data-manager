@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Prisma, PrismaClient } from "@/generated/prisma";
 import Pagination from "@/components/Pagination";
-import Search from "@/components/Search";
+import Search from "@/components/search";
 import Movies from "@/components/Movies";
 import { Suspense } from "react";
 

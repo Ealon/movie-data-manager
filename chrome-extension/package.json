@@ -1,12 +1,20 @@
 {
   "name": "movie-data-manager",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "description": "A Chrome extension that helps extract movie data from various websites and send it to a server.",
+  "packageManager": "yarn@1.22.22",
+  "type": "module",
+  "main": "dist/content.js",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "watch": "tsc -p tsconfig.json --watch"
+    "build": "rollup -c",
+    "dev": "rollup -c -w"
   },
   "devDependencies": {
-    "typescript": "^5.5.4"
+    "@rollup/plugin-typescript": "^12.1.4",
+    "@types/node": "^24.3.1",
+    "rollup": "^4.50.0",
+    "tslib": "^2.8.1",
+    "typescript": "^5.9.2"
   }
 }

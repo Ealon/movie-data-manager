@@ -1,89 +1,21 @@
-interface CoverImageInfo {
-  src: string | null;
-  title: string | null;
-  alt: string | null;
-}
+import { PROD_SERVER_BASE_URL } from "./config";
+import { extractDoubanMovieData } from "./douban";
+import { CoverImageInfo, LinkInfo, ExtractedData, YinfansMovieData } from "./types";
+import { sanitizeName, waitForElement, logger } from "./utils";
 
-interface LinkInfo {
-  quality: string;
-  size: string;
-  source: string;
-  magnet: string | null;
-  download: string | null;
-}
+// Server URL will be dynamically set based on user selection
+let SERVER_BASE_URL = PROD_SERVER_BASE_URL;
 
-interface ExtractedData {
-  title: string;
-  url: string;
-  year: number;
-  coverImage: CoverImageInfo | null;
-  links: LinkInfo[];
-}
-
-function sanitizeName(name: string) {
-  const reg = /(- YTS - Download Movie Torrent - Yify Movies)|(YIFY Torrent)|(On EN.RARBG-OFFICIAL.COM)/gim;
-  return name.replace(reg, "").trim();
-}
-
-/**
- * Waits for an element matching the selector to appear within the root.
- * Resolves with the element or null if timed out.
- */
-function waitForElement(
-  selector: string,
-  root: ParentNode = document,
-  timeoutMs: number = 15000,
-): Promise<Element | null> {
-  return new Promise((resolve) => {
-    const existing = root.querySelector(selector);
-    if (existing) {
-      resolve(existing);
-      return;
-    }
-
-    let resolved = false;
-    const observer = new MutationObserver(() => {
-      const el = root.querySelector(selector);
-      if (el) {
-        if (!resolved) {
-          resolved = true;
-          observer.disconnect();
-          resolve(el);
-        }
-      }
-    });
-    observer.observe(root === document ? document.documentElement : (root as Element), {
-      childList: true,
-      subtree: true,
-    });
-
-    const timer = setTimeout(() => {
-      if (!resolved) {
-        resolved = true;
-        observer.disconnect();
-        resolve(null);
-      }
-    }, timeoutMs);
-
-    // In case the element appears synchronously after observer starts
-    const immediate = root.querySelector(selector);
-    if (immediate && !resolved) {
-      resolved = true;
-      clearTimeout(timer);
-      observer.disconnect();
-      resolve(immediate);
-    }
-  });
-}
-
-function logger(message: string, ...args: any[]): void {
-  console.log(
-    `%c[Movie Data Manager]: ${message}`,
-    "background: #fb1; color: #000; padding: 2px 6px; border-radius: 2px; font-weight: 500; font-size:12px;",
-    "\n",
-    ...args,
-  );
-}
+// Chrome extension types
+declare const chrome: {
+  runtime: {
+    onMessage: {
+      addListener: (
+        callback: (request: any, sender: any, sendResponse: (response: any) => void) => boolean | void,
+      ) => void;
+    };
+  };
+};
 
 function main(): void {
   "use strict";
@@ -91,6 +23,60 @@ function main(): void {
   const win = window as unknown as { __movieDataManagerRan?: boolean };
   if (win.__movieDataManagerRan) return;
   win.__movieDataManagerRan = true;
+
+  // Listen for messages from popup
+  chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
+    if (request.action === "ping") {
+      // Simple ping to check if content script is ready
+      sendResponse({ success: true, message: "Content script ready" });
+      return false;
+    } else if (request.action === "extractAndSubmitDouban") {
+      handleDoubanExtractAndSubmit(request.url, request.serverUrl, sendResponse);
+      return true; // Keep message channel open for async response
+    } else if (request.action === "extractAndSubmitYinfans") {
+      handleYinfansExtractAndSubmit(request.url, request.serverUrl, sendResponse);
+      return true; // Keep message channel open for async response
+    }
+  });
+
+  /**
+   * Handles Douban data extraction and submission from popup
+   */
+  async function handleDoubanExtractAndSubmit(url: string, serverUrl: string, sendResponse: (response: any) => void) {
+    try {
+      // Update server URL for this request
+      SERVER_BASE_URL = serverUrl;
+
+      // Extract data from current page
+      const dataString = await extractDoubanMovieData();
+      if (dataString) {
+        sendResponse({ success: true, message: "Douban data submitted successfully", data: dataString });
+      } else {
+        sendResponse({ success: false, error: "Failed to extract Douban data" });
+      }
+    } catch (error) {
+      sendResponse({ success: false, error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  }
+
+  /**
+   * Handles Yinfans data extraction and submission from popup
+   */
+  async function handleYinfansExtractAndSubmit(url: string, serverUrl: string, sendResponse: (response: any) => void) {
+    try {
+      // Update server URL for this request
+      SERVER_BASE_URL = serverUrl;
+
+      // Extract data from current page
+      await extractYinfansMovieData();
+
+      // For now, we'll just send a success response
+      // In the future, you can modify this to actually send the extracted data
+      sendResponse({ success: true, message: "Yinfans data extracted successfully" });
+    } catch (error) {
+      sendResponse({ success: false, error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  }
 
   /**
    * Extracts movie data and magnet links from RARBG movie page.
@@ -179,75 +165,6 @@ function main(): void {
     return { src, title: sanitizeName(title), alt: sanitizeName(alt) };
   }
 
-  async function extractDoubanMovieData(): Promise<void> {
-    try {
-      await waitForElement('script[type="application/ld+json"]', document, 30_000);
-      const script = document.querySelector<HTMLScriptElement>('script[type="application/ld+json"]');
-      if (!script) {
-        logger("No ld+json script found on Douban page.");
-        return;
-      }
-
-      console.clear();
-
-      const payload = JSON.parse(script.textContent || "");
-      if (payload) {
-        // logger("Extracted LD+JSON:", payload);
-        const _data = {
-          title: payload.name,
-          datePublished: payload.datePublished,
-          rating: payload.aggregateRating.ratingValue,
-          image: payload.image,
-          url: payload.url,
-        };
-        logger("豆瓣电影基本信息:", "\n", JSON.stringify(_data), "\n\n");
-      } else {
-        logger("No ld+json found on Douban page.");
-      }
-    } catch (err) {
-      logger("Failed extracting Douban ld+json:", err);
-      // Fallback extraction from HTML if ld+json is missing or invalid
-      try {
-        // title: h1 > span (the first span inside h1)
-        const titleEl = document.querySelector("h1 > span");
-        const title = titleEl ? titleEl.textContent?.trim() : "";
-
-        // datePublished: h1 > span.year
-        const yearEl = document.querySelector("h1 > span.year");
-        const datePublished = yearEl ? yearEl.textContent?.replace(/[()]/g, "").trim() : "";
-
-        // rating: div.rating_self > strong.rating_num
-        const ratingEl = document.querySelector("div.rating_self > strong.rating_num");
-        const rating = ratingEl ? parseFloat(ratingEl.textContent?.trim() || "0") : 0;
-
-        // image: div#mainpic img.src
-        const imgEl = document.querySelector("div#mainpic img");
-        const image = imgEl ? imgEl.getAttribute("src") || "" : "";
-
-        // url: location.pathname
-        const url = location.pathname;
-
-        const fallbackData = {
-          title,
-          datePublished,
-          rating,
-          image,
-          url,
-        };
-        logger("豆瓣电影基本信息 (HTML fallback):", "\n", JSON.stringify(fallbackData), "\n\n");
-      } catch (fallbackErr) {
-        logger("Failed extracting Douban info from HTML:", fallbackErr);
-      }
-    }
-  }
-
-  interface YinfansMovieData {
-    link: string; // magnet link
-    quality: string; // "4K", "1080P", etc.
-    size: string; // "11.51GB", "在线观看", etc.
-    title: string; // movie title
-  }
-
   async function extractYinfansMovieData(): Promise<void> {
     try {
       // 1. Find "table#cili"
@@ -305,11 +222,11 @@ function main(): void {
   async function _run(): Promise<void> {
     try {
       // * 豆瓣电影
-      const isDoubanMoviePage = location.hostname === "movie.douban.com" && location.pathname.startsWith("/subject/");
-      if (isDoubanMoviePage) {
-        await extractDoubanMovieData();
-        return;
-      }
+      // const isDoubanMoviePage = location.hostname === "movie.douban.com" && location.pathname.startsWith("/subject/");
+      // if (isDoubanMoviePage) {
+      //   await extractDoubanMovieData();
+      //   return;
+      // }
 
       // * 音范丝 https://www.yinfans.me/movie/40111
       const isYinfansMoviePage = /yinfans/gim.test(location.hostname) && location.pathname.startsWith("/movie/");
@@ -344,7 +261,7 @@ function main(): void {
       // 8. Print out the json data into the console
       try {
         logger("Extracted data:", JSON.stringify(data, null, 2));
-        const response = await fetch("https://ealon-movie.vercel.app/api/movie", {
+        const response = await fetch(`${SERVER_BASE_URL}/api/movie`, {
           method: "POST",
           body: JSON.stringify(data),
           headers: {

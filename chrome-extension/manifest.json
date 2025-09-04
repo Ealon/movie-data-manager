@@ -1,8 +1,13 @@
 {
   "manifest_version": 3,
   "name": "Movie Data Manager Helper",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Automatically opens torrent modal, extracts links, and prints structured JSON to console.",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
   "icons": {
     "16": "logo.png",
     "32": "logo.png",
@@ -16,7 +21,8 @@
       "48": "logo.png",
       "128": "logo.png"
     },
-    "default_title": "Movie Data Manager"
+    "default_title": "Movie Data Manager",
+    "default_popup": "src/popup.html"
   },
   "content_scripts": [
     {
