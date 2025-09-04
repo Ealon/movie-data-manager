@@ -11,6 +11,8 @@ import { useState, useEffect } from "react";
 import MagnetLinks from "../MagnetLinks";
 import { DeleteMovie } from "../DeleteMovie";
 import { AddLinks } from "../AddLinks";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 
 export default function EditMovie({
   movie,
@@ -80,6 +82,10 @@ export default function EditMovie({
               <p className="text-sm font-medium text-gray-400">{movie.year}</p>
               <p className="text-sm font-medium text-gray-400">Created At: {movie.createdAt.toLocaleString()}</p>
               <p className="text-sm font-medium text-gray-400">Updated At: {movie.updatedAt.toLocaleString()}</p>
+              <div>
+                <Label htmlFor="movie-id">Movie ID</Label>
+                <Input autoFocus readOnly id="movie-id" name="movie-id" value={movie.id} />
+              </div>
             </div>
             <div className="flex-1">
               <section className="space-y-3">

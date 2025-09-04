@@ -30,6 +30,9 @@ const getData = async (skip = 0, pageSize: number, keyword?: string) => {
         ],
       }
     : undefined;
+  // {
+  //   title: { not: { contains: "Episode" } },
+  //  };
 
   const [totalMovies, movies] = await Promise.all([
     prisma.movie.count({

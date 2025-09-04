@@ -3,6 +3,7 @@ import { logger, waitForElement } from "./utils";
 // ! Use ld+json or HTML(as fallback method) to extract Douban movie data
 export async function extractDoubanMovieData(): Promise<string | null> {
   try {
+    console.clear();
     await waitForElement('script[type="application/ld+json"]', document, 30_000);
     const script = document.querySelector<HTMLScriptElement>('script[type="application/ld+json"]');
     if (!script) {
@@ -75,6 +76,9 @@ export async function sendDoubanMovieDataToServer(
     const response = await fetch(`${serverUrl}/api/douban/${movieId}`, {
       method: "POST",
       body: dataString,
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);

@@ -1,5 +1,5 @@
 import { PROD_SERVER_BASE_URL } from "./config";
-import { extractDoubanMovieData } from "./douban";
+import { extractDoubanMovieData, sendDoubanMovieDataToServer } from "./douban";
 import { CoverImageInfo, LinkInfo, ExtractedData, YinfansMovieData } from "./types";
 import { sanitizeName, waitForElement, logger } from "./utils";
 
@@ -50,6 +50,7 @@ function main(): void {
       // Extract data from current page
       const dataString = await extractDoubanMovieData();
       if (dataString) {
+        await sendDoubanMovieDataToServer(dataString, serverUrl, url);
         sendResponse({ success: true, message: "Douban data submitted successfully", data: dataString });
       } else {
         sendResponse({ success: false, error: "Failed to extract Douban data" });
@@ -222,11 +223,12 @@ function main(): void {
   async function _run(): Promise<void> {
     try {
       // * 豆瓣电影
-      // const isDoubanMoviePage = location.hostname === "movie.douban.com" && location.pathname.startsWith("/subject/");
-      // if (isDoubanMoviePage) {
-      //   await extractDoubanMovieData();
-      //   return;
-      // }
+      const isDoubanMoviePage = location.hostname === "movie.douban.com" && location.pathname.startsWith("/subject/");
+      if (isDoubanMoviePage) {
+        // x 暂时取消自动提取豆瓣电影数据
+        // await extractDoubanMovieData();
+        return;
+      }
 
       // * 音范丝 https://www.yinfans.me/movie/40111
       const isYinfansMoviePage = /yinfans/gim.test(location.hostname) && location.pathname.startsWith("/movie/");
