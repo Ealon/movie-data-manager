@@ -6,6 +6,8 @@ import Movies from "@/components/Movies";
 import { Suspense } from "react";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import { logout } from "@/lib/server-actions";
+import { Button } from "@/components/ui/button";
 
 type PageSearchParams = {
   page?: string;
@@ -79,6 +81,13 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Pa
         <Search queryName="keyword" placeholder="Search by title..." />
         <div className="flex items-center gap-2">
           <span className="text-sm font-bold text-gray-100">Total: {totalMovies}</span>
+        </div>
+        <div className="fixed right-6 top-8 z-30">
+          <form action={logout}>
+            <Button variant="ghost" type="submit">
+              Logout
+            </Button>
+          </form>
         </div>
       </header>
 

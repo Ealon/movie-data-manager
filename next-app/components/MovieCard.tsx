@@ -3,6 +3,7 @@ import { DoubanInfoUpdater } from "@/components/DoubanInfoUpdater";
 import type { DoubanInfo, Movie, Link as PrismaLink } from "@/generated/prisma";
 import EditMovie from "./EditMovie";
 import MagnetLinks from "./MagnetLinks";
+import { auth } from "@/auth";
 
 export type MovieCardProps = Movie & { links?: PrismaLink[]; doubanInfo: DoubanInfo | null };
 
@@ -72,6 +73,7 @@ const Links = ({ movie }: { movie: MovieCardProps }) => {
 };
 
 export default async function MovieCard({ movie }: { movie: MovieCardProps }) {
+  const session = await auth();
   return (
     <div key={movie.id} className="rounded-lg overflow-hidden border-2 border-white/10 group relative">
       <MovieCover movie={movie} />
@@ -80,7 +82,7 @@ export default async function MovieCard({ movie }: { movie: MovieCardProps }) {
         <div className="max-h-full overflow-auto h-fit">
           <MagnetLinks className="hidden group-hover:block text-sm space-y-1.5" links={movie.links ?? []} />
         </div>
-        {process.env.NODE_ENV === "development" && (
+        {session && (
           <div className="w-fit mx-auto hidden group-hover:block">
             <EditMovie movie={movie} doubanInfoUpdater={<DoubanInfoUpdater movieId={movie.id} />} />
           </div>
