@@ -2,7 +2,10 @@ export default function Loading() {
   return (
     <div className="max-w-[1920px] mx-auto p-6 flex flex-col justify-between min-h-screen w-full items-center relative z-10">
       <header className="mb-6 w-fit flex items-center justify-between gap-12">
-        <h1 className="text-5xl font-black text-white">Movie Database</h1>
+        <h1 className="text-5xl font-black text-white flex items-end gap-0">
+          <img src="M-Logo.svg" alt="M logo" className="size-12" />
+          <span>ovie Database</span>
+        </h1>
 
         <div className="h-9 w-52 bg-gray-300/20 rounded-md animate-pulse" />
         <div className="h-5 w-15 bg-gray-300/20 rounded-md animate-pulse" />
