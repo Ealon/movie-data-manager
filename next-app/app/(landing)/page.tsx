@@ -4,6 +4,8 @@ import Pagination from "@/components/Pagination";
 import Search from "@/components/search";
 import Movies from "@/components/Movies";
 import { Suspense } from "react";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 
 type PageSearchParams = {
   page?: string;
@@ -53,6 +55,11 @@ const getData = async (skip = 0, pageSize: number, keyword?: string) => {
 };
 
 export default async function Home({ searchParams }: { searchParams?: Promise<PageSearchParams> }) {
+  const session = await auth();
+  if (session === null) {
+    redirect("/login");
+  }
+
   const _searchParams = await searchParams;
   const currentPage = parsePositiveInt(_searchParams?.page, 1);
   const pageSize = parsePositiveInt(_searchParams?.pageSize, PAGE_SIZE);
@@ -64,7 +71,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Pa
   const totalPages = Math.max(1, Math.ceil(totalMovies / pageSize));
 
   return (
-    <div className="max-w-[1920px] mx-auto p-6 flex flex-col justify-between min-h-screen w-full items-center relative z-10">
+    <div className="max-w-[1920px] mx-auto p-6 flex flex-col justify-between min-h-screen w-full items-center">
       <header className="mb-6 w-fit flex items-center justify-between gap-12">
         <Link href="/">
           <h1 className="text-5xl font-black text-white">Movie Database</h1>

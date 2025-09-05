@@ -15,9 +15,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`Randy antialiased`}>
+      <body className="Randy antialiased">
         <Background />
-        {children}
+        <div className="relative z-10">{children}</div>
       </body>
     </html>
   );
