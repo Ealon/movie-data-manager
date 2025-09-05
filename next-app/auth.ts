@@ -79,6 +79,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     maxAge: 1 * 60 * 60, // 1 hour in seconds
     updateAge: 30 * 60, // 30 minutes in seconds
   },
+  trustHost: true,
   // callbacks: {
   //   async authorized({ auth, request: { nextUrl } }) {
   //     const isLoggedIn = !!auth?.user?.id;
@@ -96,15 +97,3 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   //   },
   // },
 });
-
-declare module "next-auth" {
-  interface Session {
-    accessToken?: string;
-  }
-}
-
-declare module "next-auth/jwt" {
-  interface JWT {
-    accessToken?: string;
-  }
-}
