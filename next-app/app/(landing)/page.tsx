@@ -76,8 +76,8 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Pa
     <div className="max-w-[1920px] mx-auto p-6 flex flex-col justify-between min-h-screen w-full items-center">
       <header className="mb-6 w-fit flex items-center justify-between gap-12">
         <Link href="/">
-          <h1 className="text-5xl font-black text-white flex items-end gap-0">
-            <img src="M-Logo.svg" alt="M logo" className="size-12" />
+          <h1 className="text-5xl font-black text-[#f01] flex items-end gap-0">
+            <img src="/logo.svg" alt="M logo" className="size-12" />
             <span>ovie Database</span>
           </h1>
         </Link>

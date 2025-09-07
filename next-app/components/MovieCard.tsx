@@ -3,7 +3,6 @@ import { DoubanInfoUpdater } from "@/components/DoubanInfoUpdater";
 import type { DoubanInfo, Movie, Link as PrismaLink } from "@/generated/prisma";
 import EditMovie from "./EditMovie";
 import MagnetLinks from "./MagnetLinks";
-import { auth } from "@/auth";
 
 export type MovieCardProps = Movie & { links?: PrismaLink[]; doubanInfo: DoubanInfo | null };
 
@@ -73,20 +72,17 @@ const Links = ({ movie }: { movie: MovieCardProps }) => {
 };
 
 export default async function MovieCard({ movie }: { movie: MovieCardProps }) {
-  const session = await auth();
   return (
     <div key={movie.id} className="rounded-lg overflow-hidden border-2 border-white/10 group relative">
       <MovieCover movie={movie} />
       <div className="absolute bottom-0 left-0 w-full h-fit pt-6 bg-gradient-to-t from-black/80 from-15% via-black/50 via-80% to-transparent">
         <MovieInfo movie={movie} />
-        <div className="max-h-full overflow-auto h-fit">
-          <MagnetLinks className="hidden group-hover:block text-sm space-y-1.5" links={movie.links ?? []} />
+        <div className="max-h-full overflow-auto h-fit hidden group-hover:block">
+          <MagnetLinks className="text-sm space-y-1.5" links={movie.links ?? []} />
         </div>
-        {session && (
-          <div className="w-fit mx-auto hidden group-hover:block">
-            <EditMovie movie={movie} doubanInfoUpdater={<DoubanInfoUpdater movieId={movie.id} />} />
-          </div>
-        )}
+        <div className="w-fit mx-auto hidden group-hover:block">
+          <EditMovie movie={movie} doubanInfoUpdater={<DoubanInfoUpdater movieId={movie.id} />} />
+        </div>
       </div>
       <Links movie={movie} />
     </div>

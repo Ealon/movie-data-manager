@@ -39,10 +39,6 @@ export default function EditMovie({
     };
   }, []);
 
-  if (process.env.NODE_ENV !== "development") {
-    return null;
-  }
-
   const coverImage = /thumbnail/gim.test(movie.coverImage ?? "") ? "/300x450.svg" : movie.coverImage;
   const searchWord = movie.url.split("/").pop()?.replaceAll("-", "+").replaceAll("+idvc100", "");
   const searchDoubanHref = `https://search.douban.com/movie/subject_search?search_text=${searchWord}`;
