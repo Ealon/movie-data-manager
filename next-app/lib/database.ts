@@ -18,7 +18,7 @@ export async function upsertDoubanInfo(movieId: string, doubanMovie: DoubanMovie
 
     if (!movie) {
       // return { ok: false, error: "Movie not found" };
-      return;
+      throw new Error("Movie not found");
     }
 
     const yearMatch = doubanMovie.datePublished.match(/\d{4}/);

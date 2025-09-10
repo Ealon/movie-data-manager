@@ -1,12 +1,19 @@
 "use server";
-
+import "server-only";
 import { revalidatePath } from "next/cache";
 import type { DoubanMovie } from "./types";
 import { PrismaClient } from "@/generated/prisma";
+import { auth } from "@/auth";
+import type { MovieCardProps } from "../MovieCard";
 
 const prisma = new PrismaClient();
 
 export async function updateDoubanInfo(formData: FormData): Promise<void> {
+  const session = await auth();
+  if (!session) {
+    return;
+  }
+
   const movieId = formData.get("movieId") as string;
   const jsonInfo = formData.get("json-info") as string;
 
@@ -62,4 +69,26 @@ export async function updateDoubanInfo(formData: FormData): Promise<void> {
 
   // return { ok: true, data: doubanInfo };
   return;
+}
+
+export async function getMovie(movieId: string): Promise<MovieCardProps | null> {
+  const session = await auth();
+  if (!session) {
+    return null;
+  }
+
+  try {
+    const movie = await prisma.movie.findUnique({
+      where: { id: movieId },
+      include: { links: { orderBy: { quality: "desc" } }, doubanInfo: true },
+    });
+    if (movie) {
+      revalidatePath("/", "page");
+      return movie;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error getting movie:", error);
+    return null;
+  }
 }

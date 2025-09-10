@@ -6,7 +6,16 @@
   "permissions": [
     "storage",
     "activeTab",
-    "scripting"
+    "scripting",
+    "cookies"
+  ],
+  "host_permissions": [
+    "https://movie.douban.com/*",
+    "https://en.rarbg-official.com/*",
+    "https://www.yinfans.me/*",
+    "https://www.yinfans.net/*",
+    "http://localhost:*/*",
+    "https://ealon-movie.vercel.app/*"
   ],
   "icons": {
     "16": "logo.png",
@@ -32,7 +41,9 @@
         "https://en.rarbg-official.com/episodes/*",
         "https://movie.douban.com/subject/*",
         "https://www.yinfans.me/movie/*",
-        "https://www.yinfans.net/movie/*"
+        "https://www.yinfans.net/movie/*",
+        "http://localhost:*/*",
+        "https://ealon-movie.vercel.app/*"
       ],
       "js": [
         "dist/content.js"

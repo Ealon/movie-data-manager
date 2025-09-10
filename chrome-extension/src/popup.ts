@@ -1,5 +1,13 @@
 // Popup script for Movie Data Manager extension
 
+import {
+  LOCAL_SERVER_BASE_URL,
+  PROD_SERVER_BASE_URL,
+  PROD_SESSION_TOKEN_NAME,
+  LOCAL_SESSION_TOKEN_NAME,
+} from "./config";
+import { setupEventListeners } from "./setupEventListeners";
+
 // Chrome extension types
 declare const chrome: {
   storage: {
@@ -7,13 +15,26 @@ declare const chrome: {
       get: (keys: string[]) => Promise<{ [key: string]: any }>;
       set: (data: { [key: string]: any }) => Promise<void>;
     };
+    local: {
+      get: (keys: string | string[] | null) => Promise<{ [key: string]: any }>;
+      set: (items: { [key: string]: any }) => Promise<void>;
+      remove: (keys: string | string[]) => Promise<void>;
+    };
   };
   tabs: {
     query: (queryInfo: { active: boolean; currentWindow: boolean }) => Promise<chrome.tabs.Tab[]>;
     sendMessage: (tabId: number, message: any) => Promise<any>;
   };
   scripting: {
-    executeScript: (injection: { target: { tabId: number }; files: string[] }) => Promise<void>;
+    executeScript: (injection: {
+      target: { tabId: number };
+      files?: string[];
+      func?: Function;
+      args?: any[];
+    }) => Promise<chrome.scripting.InjectionResult[]>;
+  };
+  cookies: {
+    get: (details: { url: string; name: string }) => Promise<chrome.cookies.Cookie | null>;
   };
 };
 
@@ -25,18 +46,33 @@ declare namespace chrome {
       title?: string;
     }
   }
+  namespace cookies {
+    interface Cookie {
+      name: string;
+      value: string;
+      domain: string;
+      path: string;
+      secure: boolean;
+      httpOnly: boolean;
+      sameSite: string;
+      expirationDate?: number;
+    }
+  }
+  namespace scripting {
+    interface InjectionResult {
+      result?: any;
+      error?: any;
+    }
+  }
 }
 
-interface PopupManager {
-  currentTab: chrome.tabs.Tab | null;
-  whichServer: "local" | "prod";
-  currentPageType: string;
-}
+type PageType = "douban" | "yinfans" | "rarbg" | "movie-db" | "unsupported";
 
-class PopupManager {
-  public currentTab: chrome.tabs.Tab | null = null;
-  public whichServer: "local" | "prod" = "prod";
-  public currentPageType: string = "unknown";
+export class PopupManager {
+  private currentTab: chrome.tabs.Tab | null = null;
+  private whichServer: "local" | "prod" = "prod";
+  private currentPageType: PageType = "unsupported";
+  private sessionTokenValue: string | null = null;
 
   constructor() {
     this.init();
@@ -44,12 +80,14 @@ class PopupManager {
 
   async init(): Promise<void> {
     await this.loadServerSelection();
+    await this.loadSessionToken();
     await this.detectCurrentPage();
-    this.setupEventListeners();
+    this._setupEventListeners();
     this.updateUI();
+    this.checkForSessionTokenExtraction();
   }
 
-  async loadServerSelection(): Promise<void> {
+  private async loadServerSelection(): Promise<void> {
     try {
       const result = await chrome.storage.sync.get(["serverSelection"]);
       if (result.serverSelection) {
@@ -69,36 +107,181 @@ class PopupManager {
       await chrome.storage.sync.set({ serverSelection: selection });
       this.whichServer = selection;
       this.updateCurrentServerUrl();
+      this.checkForSessionTokenExtraction();
     } catch (error) {
       console.error("Failed to save server selection:", error);
     }
   }
 
-  async detectCurrentPage(): Promise<void> {
+  private async loadSessionToken(): Promise<void> {
+    try {
+      const result = await chrome.storage.local.get(["sessionTokenValue"]);
+      this.sessionTokenValue = result.sessionTokenValue || null;
+      if (this.sessionTokenValue) {
+        this.showStatus(
+          document.getElementById("sessionTokenStatus")!,
+          `Session token Loaded:\n${this.sessionTokenValue.slice(0, 12)}...${this.sessionTokenValue.slice(-18)}`,
+          "success",
+        );
+      }
+    } catch (error) {
+      console.error("Failed to load session token:", error);
+    }
+  }
+
+  private async saveSessionToken(tokenValue: string): Promise<void> {
+    try {
+      await chrome.storage.local.set({ sessionTokenValue: tokenValue });
+      this.sessionTokenValue = tokenValue;
+      this.showStatus(
+        document.getElementById("sessionTokenStatus")!,
+        `Session token:\n${tokenValue.slice(0, 18)}...${tokenValue.slice(-18)}`,
+        "success",
+      );
+    } catch (error) {
+      this.showStatus(document.getElementById("sessionTokenStatus")!, "Failed to save session token", "error");
+    }
+  }
+
+  async extractSessionToken(): Promise<void> {
+    if (!this.currentTab || !this.currentTab.url) {
+      this.showStatus(document.getElementById("sessionTokenStatus")!, "No active tab found", "error");
+      return;
+    }
+
+    try {
+      const currentUrl = new URL(this.currentTab.url);
+      const isServerPage = currentUrl.origin === PROD_SERVER_BASE_URL || currentUrl.origin === LOCAL_SERVER_BASE_URL;
+
+      if (!isServerPage) {
+        this.showStatus(document.getElementById("sessionTokenStatus")!, "Current page is not a server page", "error");
+        return;
+      }
+
+      const tokenName = currentUrl.origin === PROD_SERVER_BASE_URL ? PROD_SESSION_TOKEN_NAME : LOCAL_SESSION_TOKEN_NAME;
+      let tokenValue: string | null = null;
+
+      // * Try Chrome cookies API first
+      try {
+        const cookie = await chrome.cookies.get({
+          url: this.currentTab.url,
+          name: tokenName,
+        });
+        if (cookie && cookie.value) {
+          tokenValue = cookie.value;
+        }
+      } catch (cookieError) {
+        console.log("Chrome cookies API failed, trying document.cookie fallback:", cookieError);
+      }
+
+      // * Fallback to document.cookie if Chrome API failed
+      if (!tokenValue) {
+        try {
+          // Inject a script to read document.cookie
+          const results = await chrome.scripting.executeScript({
+            target: { tabId: this.currentTab.id! },
+            func: (tokenName: string) => {
+              const cookies = document.cookie.split(";");
+              for (const cookie of cookies) {
+                const [name, value] = cookie.trim().split("=");
+                if (name === tokenName) {
+                  return value;
+                }
+              }
+              return null;
+            },
+            args: [tokenName],
+          });
+
+          if (results && results[0] && results[0].result) {
+            tokenValue = results[0].result;
+          }
+        } catch (scriptError) {
+          console.log("Document.cookie fallback failed:", scriptError);
+        }
+      }
+
+      if (tokenValue) {
+        await this.saveSessionToken(tokenValue);
+      } else {
+        this.showStatus(
+          document.getElementById("sessionTokenStatus")!,
+          `Session token '${tokenName}' not found`,
+          "error",
+        );
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      this.showStatus(
+        document.getElementById("sessionTokenStatus")!,
+        `Failed to extract session token: ${errorMessage}`,
+        "error",
+      );
+    }
+  }
+
+  private checkForSessionTokenExtraction(): void {
+    if (!this.currentTab || !this.currentTab.url) return;
+
+    const currentUrl = new URL(this.currentTab.url);
+    const isServerPage = currentUrl.origin === PROD_SERVER_BASE_URL || currentUrl.origin === LOCAL_SERVER_BASE_URL;
+
+    const sessionTokenSection = document.getElementById("sessionTokenSection");
+    if (sessionTokenSection) {
+      sessionTokenSection.style.display = isServerPage ? "block" : "none";
+    }
+  }
+
+  private async detectCurrentPage(): Promise<void> {
     try {
       const [tab] = await chrome.tabs.query({
         active: true,
         currentWindow: true,
       });
       this.currentTab = tab;
-      console.log("Current tab:", tab);
 
       if (tab.url) {
         const url = new URL(tab.url);
         this.currentPageType = this.getPageType(url);
-        console.log("Page type detected:", this.currentPageType, "for URL:", tab.url);
+
+        if (this.currentPageType === "douban") {
+          const response = await chrome.tabs.sendMessage(tab.id!, {
+            action: "extractDouban",
+          });
+          if (response.success) {
+            const extractedDoubanData = document.getElementById("extractedDoubanData");
+            if (extractedDoubanData) {
+              extractedDoubanData.textContent = JSON.stringify(response.data, null, 2);
+            }
+          }
+        } else if (this.currentPageType === "rarbg") {
+          const response = await chrome.tabs.sendMessage(tab.id!, {
+            action: "extractRarbg",
+          });
+          if (response.success) {
+            const extractedRarbgData = document.getElementById("extractedRarbgData");
+            if (extractedRarbgData) {
+              extractedRarbgData.textContent = JSON.stringify(response.data, null, 2);
+            }
+          }
+        }
       }
     } catch (error) {
       console.error("Failed to detect current page:", error);
     }
   }
 
-  getPageType(url: URL): string {
+  private getPageType(url: URL): PageType {
+    if (url.origin === PROD_SERVER_BASE_URL || url.origin === LOCAL_SERVER_BASE_URL) {
+      return "movie-db";
+    }
     if (url.hostname === "movie.douban.com" && url.pathname.startsWith("/subject/")) {
       return "douban";
-    } else if (/yinfans/.test(url.hostname) && url.pathname.startsWith("/movie/")) {
+    }
+    if (/yinfans/.test(url.hostname) && url.pathname.startsWith("/movie/")) {
       return "yinfans";
-    } else if (
+    }
+    if (
       url.hostname === "en.rarbg-official.com" &&
       (url.pathname.startsWith("/movies/") ||
         url.pathname.startsWith("/seasons/") ||
@@ -106,51 +289,29 @@ class PopupManager {
     ) {
       return "rarbg";
     }
-    return "unknown";
+    return "unsupported";
   }
 
-  setupEventListeners(): void {
-    // Server selection radio buttons
-    document.querySelectorAll('input[name="server"]').forEach((radio) => {
-      radio.addEventListener("change", (e) => {
-        const target = e.target as HTMLInputElement;
-        if (target) {
-          this.saveServerSelection(target.value as "local" | "prod");
-        }
-      });
-    });
-
-    // Douban submit button
-    const doubanSubmit = document.getElementById("doubanSubmit");
-    if (doubanSubmit) {
-      doubanSubmit.addEventListener("click", () => {
-        this.handleDoubanSubmit();
-      });
-    }
-
-    // Yinfans submit button
-    const yinfansSubmit = document.getElementById("yinfansSubmit");
-    if (yinfansSubmit) {
-      yinfansSubmit.addEventListener("click", () => {
-        this.handleYinfansSubmit();
-      });
-    }
+  private _setupEventListeners(): void {
+    setupEventListeners.call(this);
   }
 
-  updateUI(): void {
+  private updateUI(): void {
     this.updateCurrentServerUrl();
     this.showRelevantSections();
     this.updatePageStatus();
   }
 
-  updateCurrentServerUrl(): void {
+  private updateCurrentServerUrl(): void {
     const urlElement = document.getElementById("currentServerUrl");
     if (urlElement) {
-      urlElement.textContent = `Current server: ${this.whichServer}`;
+      urlElement.textContent = `Current server: ${
+        this.whichServer === "local" ? LOCAL_SERVER_BASE_URL : PROD_SERVER_BASE_URL
+      }`;
     }
   }
 
-  showRelevantSections(): void {
+  private showRelevantSections(): void {
     const sections = {
       douban: document.getElementById("doubanSection"),
       yinfans: document.getElementById("yinfansSection"),
@@ -169,14 +330,18 @@ class PopupManager {
     }
   }
 
-  updatePageStatus(): void {
+  private updatePageStatus(): void {
     const statusElement = document.getElementById("pageStatus");
     if (statusElement) {
-      if (this.currentPageType === "unknown") {
+      if (this.currentPageType === "unsupported") {
         statusElement.textContent = "Current page not supported";
         statusElement.className = "page-status unsupported";
       } else {
-        statusElement.textContent = `Current page: ${this.currentPageType.toUpperCase()}`;
+        let textContent = `Current page: ${this.currentPageType.toUpperCase()}`;
+        if (this.currentPageType === "douban") {
+          textContent = "豆瓣电影";
+        }
+        statusElement.textContent = textContent;
         statusElement.className = "page-status supported";
       }
 
@@ -190,18 +355,23 @@ class PopupManager {
   }
 
   async handleDoubanSubmit(): Promise<void> {
-    const urlInput = document.getElementById("doubanUrl") as HTMLInputElement;
+    if (!this.sessionTokenValue) {
+      this.showStatus(document.getElementById("doubanStatus")!, "Please extract/load session token first", "error");
+      return;
+    }
+
+    const _movieIdInput = document.getElementById("movieID") as HTMLInputElement;
     const submitBtn = document.getElementById("doubanSubmit") as HTMLButtonElement;
     const statusDiv = document.getElementById("doubanStatus");
 
-    if (!urlInput || !submitBtn || !statusDiv) {
+    if (!_movieIdInput || !submitBtn || !statusDiv) {
       console.error("Required elements not found");
       return;
     }
 
-    const url = urlInput.value.trim();
-    if (!url) {
-      this.showStatus(statusDiv, "Please enter a Douban movie URL", "error");
+    const _movieId = _movieIdInput.value.trim();
+    if (!_movieId) {
+      this.showStatus(statusDiv, "Please enter a movie ID", "error");
       return;
     }
 
@@ -239,15 +409,16 @@ class PopupManager {
       // Send message to content script to extract and submit data
       const response = await chrome.tabs.sendMessage(this.currentTab.id, {
         action: "extractAndSubmitDouban",
-        url,
+        movieId: _movieId,
         whichServer: this.whichServer,
+        sessionToken: this.sessionTokenValue,
       });
 
       console.log("\nresponse", response);
 
       if (response.success) {
         this.showStatus(statusDiv, "Data submitted successfully!", "success");
-        urlInput.value = "";
+        _movieIdInput.value = "";
       } else {
         this.showStatus(statusDiv, `Error1: ${response.error}`, "error");
       }
@@ -316,6 +487,7 @@ class PopupManager {
         action: "extractAndSubmitYinfans",
         url: url,
         whichServer: this.whichServer,
+        sessionToken: this.sessionTokenValue,
       });
 
       if (response.success) {
@@ -337,7 +509,73 @@ class PopupManager {
     }
   }
 
-  setButtonLoading(button: HTMLButtonElement, loading: boolean): void {
+  async handleRarbgSubmit(): Promise<void> {
+    if (!this.sessionTokenValue) {
+      this.showStatus(document.getElementById("rarbgStatus")!, "Please extract/load session token first", "error");
+      return;
+    }
+
+    const submitBtn = document.getElementById("rarbgSubmit") as HTMLButtonElement;
+    const statusDiv = document.getElementById("rarbgStatus");
+
+    if (!submitBtn || !statusDiv) {
+      console.error("Required elements not found");
+      return;
+    }
+
+    try {
+      this.setButtonLoading(submitBtn, true);
+      this.hideStatus(statusDiv);
+
+      // Check if content script is available
+      if (!this.currentTab || !this.currentTab.id) {
+        throw new Error("No active tab found");
+      }
+
+      // Try to inject content script if needed
+      try {
+        await chrome.scripting.executeScript({
+          target: { tabId: this.currentTab.id },
+          files: ["dist/content.js"],
+        });
+      } catch (injectError) {
+        console.log("Content script already injected or injection failed:", injectError);
+      }
+
+      // Wait a bit for content script to initialize and then ping it
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Ping the content script to make sure it's ready
+      try {
+        await chrome.tabs.sendMessage(this.currentTab.id, { action: "ping" });
+      } catch (pingError) {
+        console.log("Ping failed, content script not ready yet:", pingError);
+        // Wait a bit more and try again
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+
+      // Send message to content script to extract and submit data
+      const response = await chrome.tabs.sendMessage(this.currentTab.id, {
+        action: "extractAndSubmitRarbg",
+        whichServer: this.whichServer,
+        sessionToken: this.sessionTokenValue,
+      });
+
+      if (response.success) {
+        this.showStatus(statusDiv, "Data submitted successfully!", "success");
+      } else {
+        this.showStatus(statusDiv, `Error: ${response.error}`, "error");
+      }
+    } catch (error) {
+      console.error("RARBG submit error:", error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      this.showStatus(statusDiv, `Error: ${errorMessage}`, "error");
+    } finally {
+      this.setButtonLoading(submitBtn, false);
+    }
+  }
+
+  private setButtonLoading(button: HTMLButtonElement, loading: boolean): void {
     if (loading) {
       button.disabled = true;
       button.classList.add("loading");
@@ -347,13 +585,13 @@ class PopupManager {
     }
   }
 
-  showStatus(element: HTMLElement, message: string, type: string): void {
+  private showStatus(element: HTMLElement, message: string, type: string): void {
     element.textContent = message;
     element.className = `status ${type}`;
     element.style.display = "block";
   }
 
-  hideStatus(element: HTMLElement): void {
+  private hideStatus(element: HTMLElement): void {
     element.style.display = "none";
   }
 }

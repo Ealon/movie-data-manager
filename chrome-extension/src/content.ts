@@ -1,8 +1,7 @@
-import { LOCAL_SERVER_BASE_URL, PROD_SERVER_BASE_URL } from "./config";
 import { extractDoubanMovieData, sendDoubanMovieDataToServer } from "./douban";
 import { extractRarbgMovieData, sendRarbgMovieDataToServer } from "./rarbg";
-import { CoverImageInfo, LinkInfo, ExtractedData, YinfansMovieData } from "./types";
-import { waitForElement, logger } from "./utils";
+import { YinfansMovieData } from "./types";
+import { logger } from "./utils";
 
 // Chrome extension types
 declare const chrome: {
@@ -28,32 +27,110 @@ function main(): void {
       // Simple ping to check if content script is ready
       sendResponse({ success: true, message: "Content script ready" });
       return false;
+    } else if (request.action === "extractDouban") {
+      handleDoubanExtract(sendResponse);
+      return true; // Keep message channel open for async response
+    } else if (request.action === "extractRarbg") {
+      handleRarbgExtract(sendResponse);
+      return true; // Keep message channel open for async response
     } else if (request.action === "extractAndSubmitDouban") {
-      handleDoubanExtractAndSubmit(request.url, request.whichServer, sendResponse);
+      handleDoubanExtractAndSubmit(request.movieId, request.whichServer, sendResponse, request.sessionToken);
       return true; // Keep message channel open for async response
     } else if (request.action === "extractAndSubmitYinfans") {
-      handleYinfansExtractAndSubmit(request.url, request.whichServer, sendResponse);
+      handleYinfansExtractAndSubmit(request.url, request.whichServer, sendResponse, request.sessionToken);
+      return true; // Keep message channel open for async response
+    } else if (request.action === "extractAndSubmitRarbg") {
+      handleRarbgExtractAndSubmit(request.whichServer, sendResponse, request.sessionToken);
       return true; // Keep message channel open for async response
     }
   });
+
+  async function handleRarbgExtract(sendResponse: (response: any) => void) {
+    try {
+      const _rarbgMovieInfo = await extractRarbgMovieData();
+      if (_rarbgMovieInfo) {
+        sendResponse({
+          success: true,
+          data: _rarbgMovieInfo,
+        });
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      logger("RARBG extraction error:", errorMessage);
+      sendResponse({
+        success: false,
+        error: errorMessage,
+      });
+    }
+  }
+
+  async function handleRarbgExtractAndSubmit(
+    whichServer: "local" | "prod",
+    sendResponse: (response: any) => void,
+    sessionToken: string,
+  ) {
+    try {
+      const _rarbgMovieInfo = await extractRarbgMovieData();
+      if (_rarbgMovieInfo) {
+        await sendRarbgMovieDataToServer(_rarbgMovieInfo, whichServer, sessionToken);
+        sendResponse({
+          success: true,
+          message: "RARBG data submitted successfully",
+          data: _rarbgMovieInfo,
+        });
+      } else {
+        sendResponse({
+          success: false,
+          error: "Failed to extract RARBG data",
+        });
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      logger("RARBG submission error:", errorMessage);
+      sendResponse({
+        success: false,
+        error: errorMessage,
+      });
+    }
+  }
+
+  async function handleDoubanExtract(sendResponse: (response: any) => void) {
+    try {
+      const _doubanMovieInfo = await extractDoubanMovieData();
+      if (_doubanMovieInfo) {
+        sendResponse({
+          success: true,
+          data: _doubanMovieInfo,
+        });
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      logger("Douban extraction error:", errorMessage);
+      sendResponse({
+        success: false,
+        error: errorMessage,
+      });
+    }
+  }
 
   /**
    * Handles Douban data extraction and submission from popup
    */
   async function handleDoubanExtractAndSubmit(
-    url: string,
+    movieId: string,
     whichServer: "local" | "prod",
     sendResponse: (response: any) => void,
+    sessionToken: string,
   ) {
     try {
       // Extract data from current page
-      const dataString = await extractDoubanMovieData();
-      if (dataString) {
-        await sendDoubanMovieDataToServer(dataString, whichServer, url);
+      const _doubanMovieInfo = await extractDoubanMovieData();
+      if (_doubanMovieInfo) {
+        await sendDoubanMovieDataToServer(_doubanMovieInfo, whichServer, movieId, sessionToken);
         sendResponse({
           success: true,
           message: "Douban data submitted successfully",
-          data: dataString,
+          data: _doubanMovieInfo,
         });
       } else {
         sendResponse({
@@ -62,9 +139,11 @@ function main(): void {
         });
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      logger("Douban submission error:", errorMessage);
       sendResponse({
         success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: errorMessage,
       });
     }
   }
@@ -76,6 +155,7 @@ function main(): void {
     url: string,
     whichServer: "local" | "prod",
     sendResponse: (response: any) => void,
+    sessionToken?: string,
   ) {
     try {
       // Extract data from current page
@@ -167,10 +247,10 @@ function main(): void {
       }
 
       // * RARBG
-      const data = await extractRarbgMovieData();
-      if (data) {
-        logger("Extracted RARBG movie data:", "\n", JSON.stringify(data, null, 2), "\n\n");
-        await sendRarbgMovieDataToServer(data, "prod");
+      const isRarbgMoviePage =
+        /rarbg/gim.test(location.hostname) && /(movies|seasons|episodes)/gim.test(location.pathname);
+      if (isRarbgMoviePage) {
+        await extractRarbgMovieData();
         return;
       }
     } catch (error) {
@@ -183,6 +263,25 @@ function main(): void {
   } else {
     _run();
   }
+
+  // Add global function for console usage
+  (window as any).submitDoubanData = async (movieId: string, whichServer: "local" | "prod" = "prod") => {
+    try {
+      const dataString = await extractDoubanMovieData();
+      if (dataString) {
+        await sendDoubanMovieDataToServer(dataString, whichServer, movieId, "");
+        console.log("✅ Douban data submitted successfully using Bearer token authentication");
+        return { success: true, data: dataString };
+      } else {
+        console.error("❌ Failed to extract Douban data");
+        return { success: false, error: "Failed to extract Douban data" };
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      console.error("❌ Douban submission error:", errorMessage);
+      return { success: false, error: errorMessage };
+    }
+  };
 }
 
 main();

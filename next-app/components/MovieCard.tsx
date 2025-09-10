@@ -81,7 +81,7 @@ export default async function MovieCard({ movie }: { movie: MovieCardProps }) {
           <MagnetLinks className="text-sm space-y-1.5" links={movie.links ?? []} />
         </div>
         <div className="w-fit mx-auto hidden group-hover:block">
-          <EditMovie movie={movie} doubanInfoUpdater={<DoubanInfoUpdater movieId={movie.id} />} />
+          <EditMovie movieData={movie} doubanInfoUpdater={<DoubanInfoUpdater movieId={movie.id} />} />
         </div>
       </div>
       <Links movie={movie} />

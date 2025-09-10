@@ -1,10 +1,20 @@
 import { LOCAL_SERVER_BASE_URL, PROD_SERVER_BASE_URL } from "./config";
+import { DoubanMovieData } from "./types";
 import { logger, waitForElement } from "./utils";
 
 // ! Use ld+json or HTML(as fallback method) to extract Douban movie data
-export async function extractDoubanMovieData(): Promise<string | null> {
+export async function extractDoubanMovieData(): Promise<DoubanMovieData | null> {
+  console.clear();
   try {
-    console.clear();
+    const _dataStr = sessionStorage.getItem("EXTRACTED_DOUBAN_MOVIE_DATA");
+    if (_dataStr) {
+      const _data = JSON.parse(_dataStr);
+      logger("豆瓣电影基本信息(Session Storage):", "\n", JSON.stringify(_data, null, 2), "\n\n");
+      return _data;
+    }
+  } catch (error) {}
+
+  try {
     await waitForElement('script[type="application/ld+json"]', document, 30_000);
     const script = document.querySelector<HTMLScriptElement>('script[type="application/ld+json"]');
     if (!script) {
@@ -14,16 +24,16 @@ export async function extractDoubanMovieData(): Promise<string | null> {
     const payload = JSON.parse(script.textContent || "");
     if (payload) {
       // logger("Extracted LD+JSON:", payload);
-      const _data = {
+      const _data: DoubanMovieData = {
         title: payload.name,
         datePublished: payload.datePublished,
-        rating: payload.aggregateRating.ratingValue,
+        rating: Number(payload.aggregateRating.ratingValue),
         image: payload.image,
         url: payload.url,
       };
-      const dataString = JSON.stringify(_data);
-      logger("豆瓣电影基本信息:", "\n", JSON.stringify(_data, null, 2), "\n\n");
-      return dataString;
+      logger("豆瓣电影基本信息(LD+JSON):", "\n", JSON.stringify(_data, null, 2), "\n\n");
+      sessionStorage.setItem("EXTRACTED_DOUBAN_MOVIE_DATA", JSON.stringify(_data));
+      return _data;
     } else {
       logger("Parse ld+json failed.");
       return null;
@@ -42,7 +52,7 @@ export async function extractDoubanMovieData(): Promise<string | null> {
 
       // rating: div.rating_self > strong.rating_num
       const ratingEl = document.querySelector("div.rating_self > strong.rating_num");
-      const rating = ratingEl ? parseFloat(ratingEl.textContent?.trim() || "0") : 0;
+      const rating = ratingEl ? Number(ratingEl.textContent?.trim() || "0") : 0;
 
       // image: div#mainpic img.src
       const imgEl = document.querySelector("div#mainpic img");
@@ -51,16 +61,17 @@ export async function extractDoubanMovieData(): Promise<string | null> {
       // url: location.pathname
       const url = location.pathname;
 
-      const fallbackData = {
-        title,
-        datePublished,
+      const fallbackData: DoubanMovieData = {
+        title: title || "",
+        datePublished: datePublished || "",
         rating,
         image,
         url,
       };
-      const dataString = JSON.stringify(fallbackData);
+
       logger("豆瓣电影基本信息 (HTML Fallback):", "\n", JSON.stringify(fallbackData, null, 2), "\n\n");
-      return dataString;
+      sessionStorage.setItem("EXTRACTED_DOUBAN_MOVIE_DATA", JSON.stringify(fallbackData));
+      return fallbackData;
     } catch (fallbackErr) {
       logger("Failed to extract Douban info from HTML:", fallbackErr);
       return null;
@@ -69,25 +80,32 @@ export async function extractDoubanMovieData(): Promise<string | null> {
 }
 
 export async function sendDoubanMovieDataToServer(
-  dataString: string,
+  data: DoubanMovieData,
   whichServer: "local" | "prod",
   movieId: string,
+  sessionToken: string,
 ): Promise<void> {
   try {
-    const response = await fetch(
-      `${whichServer === "local" ? LOCAL_SERVER_BASE_URL : PROD_SERVER_BASE_URL}/api/douban/${movieId}`,
-      {
-        method: "POST",
-        body: dataString,
-        headers: {
-          "Content-Type": "application/json",
-        },
+    const serverUrl = whichServer === "local" ? LOCAL_SERVER_BASE_URL : PROD_SERVER_BASE_URL;
+    const url = `${serverUrl}/api/douban/${movieId}`;
+
+    const response = await fetch(url, {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        Authorization: `Bearer ${sessionToken}`,
+        "Content-Type": "application/json",
       },
-    );
+    });
+
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorText = await response.text();
+      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
     }
+
+    logger("Douban movie data sent successfully");
   } catch (err) {
     logger("Failed to send Douban movie data to server:", err);
+    throw err; // 重新抛出错误，让调用者处理
   }
 }

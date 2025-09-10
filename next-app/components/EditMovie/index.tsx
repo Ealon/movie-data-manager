@@ -5,23 +5,48 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import type { MovieCardProps } from "../MovieCard";
-import { ExternalLink, EyeIcon, StarIcon } from "lucide-react";
+import { CopyCheckIcon, CopyIcon, ExternalLink, EyeIcon, RefreshCcwIcon, StarIcon } from "lucide-react";
 import doubanLogo from "./douban.svg";
 import { useState, useEffect } from "react";
 import MagnetLinks from "../MagnetLinks";
 import { DeleteMovie } from "../DeleteMovie";
 import { AddLinks } from "../AddLinks";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
+import { ToggleHidden } from "../ToggleHidden";
+import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
+import { getMovie } from "./action";
 
 export default function EditMovie({
-  movie,
+  movieData,
   doubanInfoUpdater,
 }: {
-  movie: MovieCardProps;
+  movieData: MovieCardProps;
   doubanInfoUpdater: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [_copiedText, copy] = useCopyToClipboard();
+  const [_movie, setMovie] = useState<MovieCardProps | null>(null);
+
+  const handleRefresh = () =>
+    getMovie(movieData.id).then((_movie) => {
+      if (_movie) {
+        setMovie(_movie);
+      }
+    });
+
+  const handleCopy = (text: string) => () => {
+    copy(text)
+      .then(() => {
+        console.log("Copied!", { text });
+        setCopied(true);
+        setTimeout(() => {
+          setCopied(false);
+        }, 2000);
+      })
+      .catch((error) => {
+        console.error("Failed to copy!", error);
+      });
+  };
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -39,6 +64,7 @@ export default function EditMovie({
     };
   }, []);
 
+  const movie = _movie ?? movieData;
   const coverImage = /thumbnail/gim.test(movie.coverImage ?? "") ? "/300x450.svg" : movie.coverImage;
   const searchWord = movie.url.split("/").pop()?.replaceAll("-", "+").replaceAll("+idvc100", "");
   const searchDoubanHref = `https://search.douban.com/movie/subject_search?search_text=${searchWord}`;
@@ -60,7 +86,7 @@ export default function EditMovie({
       >
         <DialogHeader>
           <DialogTitle>
-            <span className="text-gray-400">Edit - </span> {movie?.doubanInfo?.title ?? movie.title}
+            <span className="text-gray-400">Edit - </span> {movie.doubanInfo?.title ?? movie.title}
           </DialogTitle>
         </DialogHeader>
         <article>
@@ -74,13 +100,20 @@ export default function EditMovie({
                 title={movie.coverTitle ?? movie.title}
                 className="object-cover aspect-[2/3] bg-[url('/300x450.svg')] rounded-lg mb-6"
               />
-              <h2 className="text-lg font-bold my-3">{movie.title}</h2>
+              <h2 className="text-lg font-bold my-3 flex items-center gap-2">
+                {movie.title}
+                <Button variant="ghost" size="icon" onClick={handleRefresh}>
+                  <RefreshCcwIcon className="size-4" />
+                </Button>
+              </h2>
               <p className="text-sm font-medium text-gray-400">{movie.year}</p>
               <p className="text-sm font-medium text-gray-400">Created At: {movie.createdAt.toLocaleString()}</p>
               <p className="text-sm font-medium text-gray-400">Updated At: {movie.updatedAt.toLocaleString()}</p>
               <div>
-                <Label htmlFor="movie-id">Movie ID</Label>
-                <Input autoFocus readOnly id="movie-id" name="movie-id" value={movie.id} />
+                <Button className="flex items-center gap-2" disabled={copied} onClick={handleCopy(movie.id)}>
+                  <span>{copied ? "Copied" : "Copy Movie ID"}</span>
+                  {copied ? <CopyCheckIcon className="size-4" /> : <CopyIcon className="size-4" />}
+                </Button>
               </div>
             </div>
             <div className="flex-1">
@@ -139,7 +172,8 @@ export default function EditMovie({
               <section className="mt-6 p-5 border-2 border-red-500 border-dashed rounded-lg relative">
                 <h2 className="text-lg font-bold text-rose-500">Danger Zone</h2>
                 <DeleteMovie movieId={movie.id} />
-                <div className="absolute top-0 left-0 w-full h-full bg-rose-500/20 z-50" />
+                <ToggleHidden movieId={movie.id} hidden={movie.hidden} />
+                <div className="absolute hidden top-0 left-0 w-full h-full bg-rose-500/20 z-50" />
               </section>
             </div>
           </section>

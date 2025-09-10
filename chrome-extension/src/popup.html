@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Movie Data Manager</title>
+    <title>Movie Data Helper</title>
     <style>
       * {
         margin: 0;
@@ -11,25 +11,39 @@
         box-sizing: border-box;
       }
 
+      code pre {
+        background: #334;
+        color: #fff;
+        padding: 8px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-family: monospace;
+        margin: 8px auto;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+
       body {
         width: 400px;
         min-height: 300px;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        background: #f8f9fa;
+        background: #223;
         color: #333;
       }
 
       .header {
-        background: #2c3e50;
-        color: white;
-        padding: 16px;
+        padding: 12px;
         text-align: center;
-        border-bottom: 1px solid #34495e;
       }
 
       .header h1 {
-        font-size: 18px;
-        font-weight: 500;
+        color: #f01;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: 600;
       }
 
       .content {
@@ -47,14 +61,14 @@
       .section h2 {
         font-size: 16px;
         margin-bottom: 12px;
-        color: #2c3e50;
+        color: #b6020e;
         font-weight: 500;
       }
 
       .radio-group {
         display: flex;
         gap: 16px;
-        margin-bottom: 16px;
+        margin-bottom: 8px;
       }
 
       .radio-option {
@@ -157,7 +171,7 @@
 
       .status.success {
         background: #d4edda;
-        color: #155724;
+        color: #045e19;
         border: 1px solid #c3e6cb;
       }
 
@@ -167,14 +181,9 @@
         border: 1px solid #f5c6cb;
       }
 
-      .hidden {
-        display: none;
-      }
-
       .current-url {
         font-size: 12px;
         color: #666;
-        margin-top: 4px;
         word-break: break-all;
       }
 
@@ -188,7 +197,7 @@
 
       .page-status.supported {
         background: #d4edda;
-        color: #155724;
+        color: #045e19;
         border: 1px solid #c3e6cb;
       }
 
@@ -197,18 +206,68 @@
         color: #721c24;
         border: 1px solid #f5c6cb;
       }
+
+      .btn-small {
+        padding: 6px 12px;
+        font-size: 12px;
+        width: auto;
+        display: inline-block;
+        margin-right: 8px;
+      }
+
+      .btn-secondary {
+        background: #95a5a6;
+      }
+
+      .btn-secondary:hover {
+        background: #7f8c8d;
+      }
+
+      .btn-group {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .form-group textarea {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 12px;
+        font-family: monospace;
+        resize: vertical;
+        min-height: 60px;
+      }
+
+      .form-group textarea:focus {
+        outline: none;
+        border-color: #3498db;
+      }
+
+      .form-group label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+      }
+
+      .form-group input[type="checkbox"] {
+        width: auto;
+        margin: 0;
+      }
     </style>
   </head>
   <body>
     <div class="header">
-      <h1>Movie Data Manager</h1>
+      <h1><img src="./logo.svg" width="28" height="28" alt="Movie Data Helper" />ovie Data Helper</h1>
       <div id="pageStatus" class="page-status"></div>
     </div>
 
     <div class="content">
       <!-- Server Configuration Section -->
       <div class="section">
-        <h2>Server Configuration</h2>
+        <h2>Select Server</h2>
         <div class="radio-group">
           <div class="radio-option">
             <input type="radio" id="local" name="server" value="local" />
@@ -222,20 +281,33 @@
         <div class="current-url" id="currentServerUrl"></div>
       </div>
 
+      <!-- Session Token Management Section -->
+      <div class="section" id="sessionTokenSection" style="display: none">
+        <h2>Extract session token</h2>
+        <button class="btn" id="extractTokenBtn">Extract Session Token</button>
+        <div class="status" id="sessionTokenStatus"></div>
+      </div>
+
       <!-- Douban Section -->
       <div class="section" id="doubanSection">
-        <h2>Douban Movie Data</h2>
+        <h2>Update Douban Movie Data</h2>
+        <code>
+          <pre id="extractedDoubanData"></pre>
+        </code>
         <div class="form-group">
-          <label for="doubanUrl">Movie URL:</label>
-          <input type="text" id="doubanUrl" placeholder="Enter Douban movie URL" />
+          <label for="movieID">Movie ID:</label>
+          <input type="text" id="movieID" placeholder="Enter movie ID" />
         </div>
-        <button class="btn" id="doubanSubmit">Submit to updateDouban</button>
+        <button class="btn" id="doubanSubmit">Submit</button>
         <div class="status" id="doubanStatus"></div>
       </div>
 
       <!-- Yinfans Section -->
       <div class="section" id="yinfansSection">
         <h2>Yinfans Movie Data</h2>
+        <code>
+          <pre id="extractedYinfansData"></pre>
+        </code>
         <div class="form-group">
           <label for="yinfansUrl">Movie URL:</label>
           <input type="text" id="yinfansUrl" placeholder="Enter Yinfans movie URL" />
@@ -247,9 +319,10 @@
       <!-- RARBG Section -->
       <div class="section" id="rarbgSection">
         <h2>RARBG Movie Data</h2>
-        <p style="font-size: 13px; color: #666; margin-bottom: 12px">
-          RARBG data is automatically extracted and sent to the server.
-        </p>
+        <code>
+          <pre id="extractedRarbgData"></pre>
+        </code>
+        <button class="btn" id="rarbgSubmit">Submit</button>
         <div class="status" id="rarbgStatus"></div>
       </div>
     </div>

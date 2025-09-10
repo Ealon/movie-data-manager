@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Link, PrismaClient } from "@/generated/prisma";
-import { sanitizeName } from "@/lib/utils";
+import { sanitizeName, withCors } from "@/lib/utils";
 
 const prisma = new PrismaClient();
 
@@ -9,10 +9,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     // Basic shape validation
     if (!body || typeof body !== "object") {
-      return withCors(NextResponse.json({ message: "Invalid body" }, { status: 400 }));
+      return withCors(NextResponse.json({ message: "Invalid body" }, { status: 400 }), "rarbg");
     }
     if (typeof body.title !== "string" || typeof body.url !== "string") {
-      return withCors(NextResponse.json({ message: "Missing title or url" }, { status: 400 }));
+      return withCors(NextResponse.json({ message: "Missing title or url" }, { status: 400 }), "rarbg");
     }
     const links = Array.isArray(body.links) ? body.links : [];
     const normalizedLinks = links
@@ -69,9 +69,9 @@ export async function POST(request: NextRequest) {
             },
           });
         }
-        return NextResponse.json(
-          { message: "Movie and all links already exist", movie: existingMovie },
-          { status: 200 },
+        return withCors(
+          NextResponse.json({ message: "Movie and all links already exist", movie: existingMovie }, { status: 200 }),
+          "rarbg",
         );
       }
 
@@ -97,7 +97,10 @@ export async function POST(request: NextRequest) {
         include: { links: true },
       });
 
-      return NextResponse.json({ message: "Movie exists, new links added", movie: updatedMovie }, { status: 200 });
+      return withCors(
+        NextResponse.json({ message: "Movie exists, new links added", movie: updatedMovie }, { status: 200 }),
+        "rarbg",
+      );
     }
 
     const movie = await prisma.movie.create({
@@ -119,20 +122,13 @@ export async function POST(request: NextRequest) {
         },
       },
     });
-    return withCors(NextResponse.json({ message: "Movie created successfully", movie }, { status: 201 }));
+    return withCors(NextResponse.json({ message: "Movie created successfully", movie }, { status: 201 }), "rarbg");
   } catch (error) {
     console.error(error);
-    return withCors(NextResponse.json({ message: "Error" }, { status: 500 }));
+    return withCors(NextResponse.json({ message: "Error" }, { status: 500 }), "rarbg");
   }
 }
 
 export async function OPTIONS() {
-  return withCors(new NextResponse(null, { status: 204 }));
-}
-
-function withCors(res: NextResponse) {
-  res.headers.set("Access-Control-Allow-Origin", "*");
-  res.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.headers.set("Access-Control-Allow-Headers", "Content-Type");
-  return res;
+  return withCors(new NextResponse(null, { status: 204 }), "rarbg");
 }

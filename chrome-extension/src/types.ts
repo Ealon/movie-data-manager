@@ -26,3 +26,11 @@ export interface YinfansMovieData {
   size: string; // "11.51GB", "在线观看", etc.
   title: string; // movie title
 }
+
+export interface DoubanMovieData {
+  title: string;
+  datePublished: string;
+  rating: number;
+  image: string;
+  url: string;
+}

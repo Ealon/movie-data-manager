@@ -41,6 +41,16 @@ async function getCoverImageInfo(): Promise<CoverImageInfo | null> {
  * Extracts movie data and magnet links from RARBG movie page.
  */
 export async function extractRarbgMovieData(): Promise<ExtractedData | null> {
+  console.clear();
+  try {
+    const _dataStr = sessionStorage.getItem("EXTRACTED_RARBG_MOVIE_DATA");
+    if (_dataStr) {
+      const _data = JSON.parse(_dataStr);
+      logger("RARBG电影基本信息(Session Storage):", "\n", JSON.stringify(_data, null, 2), "\n\n");
+      return _data;
+    }
+  } catch (error) {}
+
   try {
     const table = await waitForElement(".modal-download .modal-content table", document, 12000);
     if (!table) {
@@ -92,6 +102,8 @@ export async function extractRarbgMovieData(): Promise<ExtractedData | null> {
       links,
     };
 
+    logger("RARBG电影基本信息(LD+JSON):", "\n", JSON.stringify(data, null, 2), "\n\n");
+    sessionStorage.setItem("EXTRACTED_RARBG_MOVIE_DATA", JSON.stringify(data));
     return data;
   } catch (error) {
     logger("Error extracting RARBG movie data:", error);
@@ -99,24 +111,33 @@ export async function extractRarbgMovieData(): Promise<ExtractedData | null> {
   }
 }
 
-export async function sendRarbgMovieDataToServer(data: ExtractedData, whichServer: "local" | "prod"): Promise<void> {
+export async function sendRarbgMovieDataToServer(
+  data: ExtractedData,
+  whichServer: "local" | "prod",
+  sessionToken: string,
+): Promise<void> {
   try {
-    const response = await fetch(
-      `${whichServer === "local" ? LOCAL_SERVER_BASE_URL : PROD_SERVER_BASE_URL}/api/movie`,
-      {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: {
-          "Content-Type": "application/json",
-        },
+    const serverUrl = whichServer === "local" ? LOCAL_SERVER_BASE_URL : PROD_SERVER_BASE_URL;
+    const url = `${serverUrl}/api/movie`;
+
+    const response = await fetch(url, {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        Authorization: `Bearer ${sessionToken}`,
+        "Content-Type": "application/json",
       },
-    );
+    });
+
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorText = await response.text();
+      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
     }
+
     const result = await response.json();
     logger("Server Response:", JSON.stringify(result, null, 2));
   } catch (error) {
     logger("Failed to send RARBG movie data to server:", error);
+    throw error; // 重新抛出错误，让调用者处理
   }
 }

@@ -8,6 +8,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { logout } from "@/lib/server-actions";
 import { Button } from "@/components/ui/button";
+import { TestApi } from "@/components/TestApi";
 
 type PageSearchParams = {
   page?: string;
@@ -33,7 +34,7 @@ const getData = async (skip = 0, pageSize: number, keyword?: string) => {
           { doubanInfo: { title: { contains: keyword, mode: "insensitive" } } },
         ],
       }
-    : undefined;
+    : { hidden: false };
   // {
   //   title: { not: { contains: "Episode" } },
   //  };
@@ -98,6 +99,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Pa
         <Suspense fallback={<div>Loading...</div>}>
           <Movies movies={movies} />
         </Suspense>
+        <TestApi />
         <div>
           <Pagination
             pathname="/"
